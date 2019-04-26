@@ -1,0 +1,17 @@
+Heavily minimized version of “play sfx when level up” by sergi4ua <sergiy4ua@gmail.com>
+
+
+
+diff --git a/Source/player.cpp b/Source/player.cpp
+index 020e3d7..c0f971a 100644
+--- a/Source/player.cpp
++++ b/Source/player.cpp
+@@ -741,6 +741,8 @@ void NextPlrLevel(int pnum)
+ 	if (pnum == myplr) {
+ 		drawmanaflag = TRUE;
+ 	}
++
++	PlaySFX(IS_QUESTDN);
+ }
+ 
+ void AddPlrExperience(int pnum, int lvl, int exp)
