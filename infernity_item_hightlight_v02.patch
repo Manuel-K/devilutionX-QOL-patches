@@ -5,7 +5,7 @@ Some refactoring and cleaning applied.
 From Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 787b8a4..3314bc8 100644
+index 19952c1..7f2c594 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
 @@ -16,6 +16,7 @@ BOOL gbRunGame;
@@ -16,7 +16,7 @@ index 787b8a4..3314bc8 100644
  BOOL gbProcessPlayers;
  int glEndSeed[NUMLEVELS];
  BOOL gbLoadGame;
-@@ -1057,6 +1058,9 @@ void ReleaseKey(int vkey)
+@@ -1064,6 +1065,9 @@ void ReleaseKey(int vkey)
  {
  	if (vkey == VK_SNAPSHOT)
  		CaptureScreen();
@@ -26,7 +26,7 @@ index 787b8a4..3314bc8 100644
  }
  
  void PressKey(int vkey)
-@@ -1224,6 +1228,8 @@ void PressKey(int vkey)
+@@ -1231,6 +1235,8 @@ void PressKey(int vkey)
  		if(stextflag) {
  			STextNext();
  		}
@@ -36,10 +36,10 @@ index 787b8a4..3314bc8 100644
  		if(automapflag && !talkflag) {
  			AutomapLeft();
 diff --git a/Source/diablo.h b/Source/diablo.h
-index b6592fb..6627752 100644
+index c26a505..558c90c 100644
 --- a/Source/diablo.h
 +++ b/Source/diablo.h
-@@ -14,6 +14,7 @@ extern BOOL gbRunGame;
+@@ -95,6 +95,7 @@ extern BOOL gbRunGame;
  extern int glMid3Seed[NUMLEVELS];
  extern BOOL gbRunGameResult;
  extern int zoomflag; // weak
@@ -48,12 +48,12 @@ index b6592fb..6627752 100644
  extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 51ca254..fe8795e 100644
+index 538caac..c29d056 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
-@@ -2,6 +2,10 @@
- 
- #include "../types.h"
+@@ -1,6 +1,10 @@
+ #include "diablo.h"
+ #include "../3rdParty/Storm/Source/storm.h"
  
 +#include <string>
 +#include <vector>
@@ -61,8 +61,8 @@ index 51ca254..fe8795e 100644
 +
  DEVILUTION_BEGIN_NAMESPACE
  
- int light_table_index; // weak
-@@ -396,6 +400,10 @@ void DrawView(int StartX, int StartY)
+ int light_table_index;
+@@ -390,6 +394,10 @@ void DrawView(int StartX, int StartY)
  
  	DrawDurIcon();
  
@@ -73,9 +73,9 @@ index 51ca254..fe8795e 100644
  	if(chrflag) {
  		DrawChr();
  	} else if(questlog) {
-@@ -1433,6 +1567,140 @@ void scrollrt_draw_clipped_dungeon_2(char *buffer, int x, int y, int skipChunks,
- // 69CF94: using guessed type int cel_transparency_active;
- // 69EFA4: using guessed type int draw_monster_num;
+@@ -1358,6 +1366,140 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
+ 	}
+ }
  
 +void HighlightItemsNameOnMap()
 +{
@@ -215,34 +215,36 @@ index 51ca254..fe8795e 100644
  {
  	int lti_old, cta_old, lpi_old;
 diff --git a/Source/scrollrt.h b/Source/scrollrt.h
-index 1466a7b..c3871c2 100644
+index baeac29..80fe7e6 100644
 --- a/Source/scrollrt.h
 +++ b/Source/scrollrt.h
-@@ -28,6 +29,7 @@ void DrawClippedObject(int x, int y, int ox, int oy, BOOL pre, int CelSkip, int
+@@ -28,6 +28,7 @@ void DrawClippedObject(int x, int y, int ox, int oy, BOOL pre, int CelSkip, int
  void scrollrt_draw_clipped_e_flag(BYTE *pBuff, int x, int y, int sx, int sy);
  void scrollrt_draw_lower_2(int x, int y, int sx, int sy, int chunks, int skipChunks, int eflag);
- void scrollrt_draw_clipped_dungeon_2(char *buffer, int x, int y, int skipChunks, int CelSkip, int sx, int sy, int eflag);
+ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks, int CelSkip, int dx, int dy, int eflag);
 +void HighlightItemsNameOnMap();
  void scrollrt_draw_clipped_e_flag_2(BYTE *pBuff, int x, int y, int skipChunks, signed int CelSkip, int sx, int sy);
  void scrollrt_draw_upper(int x, int y, int sx, int sy, int chunks, int capChunks, int eflag);
  void scrollrt_draw_dungeon(BYTE *pBuff, int sx, int sy, int capChunks, int CelCap, int dx, int dy, int eflag);
 diff --git a/Source/town.cpp b/Source/town.cpp
-index 845355f..942caf9 100644
+index 6bb1385..2b56405 100644
 --- a/Source/town.cpp
 +++ b/Source/town.cpp
-@@ -1043,6 +1043,7 @@ void T_DrawView(int StartX, int StartY)
+@@ -1015,6 +1015,9 @@ void T_DrawView(int StartX, int StartY)
  		DrawDiabloMsg();
  	if (PauseMode && !deathflag)
  		gmenu_draw_pause();
-+	HighlightItemsNameOnMap();
++	if(drawitems) {
++		HighlightItemsNameOnMap();
++	}
  	DrawPlrMsg();
  	gmenu_draw();
  	doom_draw();
 diff --git a/SourceS/miniwin/misc.h b/SourceS/miniwin/misc.h
-index 9840f63..c149a63 100644
+index cf4b054..f794897 100644
 --- a/SourceS/miniwin/misc.h
 +++ b/SourceS/miniwin/misc.h
-@@ -761,6 +761,8 @@ constexpr auto DVL_VK_OEM_4 = 0xDB;
+@@ -763,6 +763,8 @@ constexpr auto DVL_VK_OEM_4 = 0xDB;
  constexpr auto DVL_VK_OEM_5 = 0xDC;
  constexpr auto DVL_VK_OEM_6 = 0xDD;
  constexpr auto DVL_VK_OEM_7 = 0xDE;
