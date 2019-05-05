@@ -48,7 +48,7 @@ index c26a505..558c90c 100644
  extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 538caac..c29d056 100644
+index 538caac..de3f99b 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
 @@ -1,6 +1,10 @@
@@ -73,7 +73,7 @@ index 538caac..c29d056 100644
  	if(chrflag) {
  		DrawChr();
  	} else if(questlog) {
-@@ -1358,6 +1366,140 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
+@@ -1358,6 +1366,145 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
  	}
  }
  
@@ -193,6 +193,11 @@ index 538caac..c29d056 100644
 +			drawXOffset += 160;
 +
 +		char color = COL_WHITE;
++		if (t.magicLevel == ITEM_QUALITY_MAGIC) {
++			color = COL_BLUE;
++		} else if (t.magicLevel == ITEM_QUALITY_UNIQUE) {
++			color = COL_GOLD;
++		}
 +		int sx = t.x + XOffset + drawXOffset;
 +		int sy = t.y + 180;
 +
