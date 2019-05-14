@@ -4,8 +4,10 @@ Some refactoring and cleaning applied.
 
 From Infernity by quendel, extracted by sergi4ua.
 
+Rebased on devilutionX 0.3.1.
+
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 19952c1..7f2c594 100644
+index 622491e..e3a3c67 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
 @@ -16,6 +16,7 @@ BOOL gbRunGame;
@@ -16,7 +18,7 @@ index 19952c1..7f2c594 100644
  BOOL gbProcessPlayers;
  int glEndSeed[NUMLEVELS];
  BOOL gbLoadGame;
-@@ -1064,6 +1065,9 @@ void ReleaseKey(int vkey)
+@@ -1044,6 +1045,9 @@ void __fastcall ReleaseKey(int vkey)
  {
  	if (vkey == VK_SNAPSHOT)
  		CaptureScreen();
@@ -25,21 +27,22 @@ index 19952c1..7f2c594 100644
 +		drawitems = false;
  }
  
- void PressKey(int vkey)
-@@ -1231,6 +1235,8 @@ void PressKey(int vkey)
- 		if(stextflag) {
- 			STextNext();
- 		}
-+	} else if(vkey == 0x12) {
-+		drawitems = true;
- 	} else if(vkey == VK_LEFT) {
- 		if(automapflag && !talkflag) {
- 			AutomapLeft();
+ void __fastcall PressKey(int vkey)
+@@ -1195,6 +1199,9 @@ void __fastcall PressKey(int vkey)
+ 							if (stextflag)
+ 								STextNext();
+ 							return;
++						case 0x12:
++							drawitems = true;
++							return;
+ 						case VK_LEFT:
+ 							if (automapflag && !talkflag)
+ 								AutomapLeft();
 diff --git a/Source/diablo.h b/Source/diablo.h
-index c26a505..558c90c 100644
+index 6bd341f..ce260ba 100644
 --- a/Source/diablo.h
 +++ b/Source/diablo.h
-@@ -95,6 +95,7 @@ extern BOOL gbRunGame;
+@@ -14,6 +14,7 @@ extern BOOL gbRunGame;
  extern int glMid3Seed[NUMLEVELS];
  extern BOOL gbRunGameResult;
  extern int zoomflag; // weak
@@ -48,12 +51,12 @@ index c26a505..558c90c 100644
  extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 538caac..de3f99b 100644
+index 435c8df..c55998f 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
-@@ -1,6 +1,10 @@
- #include "diablo.h"
- #include "../3rdParty/Storm/Source/storm.h"
+@@ -2,6 +2,10 @@
+ 
+ #include "../types.h"
  
 +#include <string>
 +#include <vector>
@@ -61,8 +64,8 @@ index 538caac..de3f99b 100644
 +
  DEVILUTION_BEGIN_NAMESPACE
  
- int light_table_index;
-@@ -390,6 +394,10 @@ void DrawView(int StartX, int StartY)
+ int light_table_index; // weak
+@@ -395,6 +399,10 @@ void __fastcall DrawView(int StartX, int StartY)
  
  	DrawDurIcon();
  
@@ -70,12 +73,12 @@ index 538caac..de3f99b 100644
 +		HighlightItemsNameOnMap();
 +	}
 +
- 	if(chrflag) {
+ 	if (chrflag)
  		DrawChr();
- 	} else if(questlog) {
-@@ -1358,6 +1366,145 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
- 	}
- }
+ 	else if (questlog)
+@@ -1616,6 +1624,145 @@ void __fastcall scrollrt_draw_clipped_dungeon_2(char *buffer, int x, int y, int
+ // 69CF94: using guessed type int cel_transparency_active;
+ // 69EFA4: using guessed type int draw_monster_num;
  
 +void HighlightItemsNameOnMap()
 +{
@@ -216,26 +219,26 @@ index 538caac..de3f99b 100644
 +	}
 +}
 +
- void scrollrt_draw_clipped_e_flag_2(BYTE *pBuff, int x, int y, int skipChunks, signed int CelSkip, int sx, int sy)
+ void __fastcall scrollrt_draw_clipped_e_flag_2(char *buffer, int x, int y, int a4, signed int a5, int sx, int sy)
  {
- 	int lti_old, cta_old, lpi_old;
+ 	int v7;              // eax
 diff --git a/Source/scrollrt.h b/Source/scrollrt.h
-index baeac29..80fe7e6 100644
+index fcf3ea2..48a6405 100644
 --- a/Source/scrollrt.h
 +++ b/Source/scrollrt.h
-@@ -28,6 +28,7 @@ void DrawClippedObject(int x, int y, int ox, int oy, BOOL pre, int CelSkip, int
- void scrollrt_draw_clipped_e_flag(BYTE *pBuff, int x, int y, int sx, int sy);
- void scrollrt_draw_lower_2(int x, int y, int sx, int sy, int chunks, int skipChunks, int eflag);
- void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks, int CelSkip, int dx, int dy, int eflag);
+@@ -28,6 +28,7 @@ void __fastcall DrawClippedObject(int x, int y, int ox, int oy, BOOL pre, int a6
+ void __fastcall scrollrt_draw_clipped_e_flag(char *buffer, int x, int y, int a4, int a5);
+ void __fastcall scrollrt_draw_lower_2(int x, int y, int sx, int sy, int a5, int a6, int some_flag);
+ void __fastcall scrollrt_draw_clipped_dungeon_2(char *buffer, int x, int y, int a4, int a5, int sx, int sy, int me_flag);
 +void HighlightItemsNameOnMap();
- void scrollrt_draw_clipped_e_flag_2(BYTE *pBuff, int x, int y, int skipChunks, signed int CelSkip, int sx, int sy);
- void scrollrt_draw_upper(int x, int y, int sx, int sy, int chunks, int capChunks, int eflag);
- void scrollrt_draw_dungeon(BYTE *pBuff, int sx, int sy, int capChunks, int CelCap, int dx, int dy, int eflag);
+ void __fastcall scrollrt_draw_clipped_e_flag_2(char *buffer, int x, int y, int a4, signed int a5, int sx, int sy);
+ void __fastcall scrollrt_draw_upper(int x, int y, int sx, int sy, int a5, int a6, int some_flag);
+ void __fastcall scrollrt_draw_dungeon(char *buffer, int x, int y, int a4, int a5, int sx, int sy, int me_flag);
 diff --git a/Source/town.cpp b/Source/town.cpp
-index 6bb1385..2b56405 100644
+index e3c0e2b..2624157 100644
 --- a/Source/town.cpp
 +++ b/Source/town.cpp
-@@ -1015,6 +1015,9 @@ void T_DrawView(int StartX, int StartY)
+@@ -1233,6 +1233,9 @@ void __fastcall T_DrawView(int StartX, int StartY)
  		DrawDiabloMsg();
  	if (PauseMode && !deathflag)
  		gmenu_draw_pause();
@@ -246,10 +249,10 @@ index 6bb1385..2b56405 100644
  	gmenu_draw();
  	doom_draw();
 diff --git a/SourceS/miniwin/misc.h b/SourceS/miniwin/misc.h
-index cf4b054..f794897 100644
+index 958fe17..8f0a6f6 100644
 --- a/SourceS/miniwin/misc.h
 +++ b/SourceS/miniwin/misc.h
-@@ -763,6 +763,8 @@ constexpr auto DVL_VK_OEM_4 = 0xDB;
+@@ -759,6 +759,8 @@ constexpr auto DVL_VK_OEM_4 = 0xDB;
  constexpr auto DVL_VK_OEM_5 = 0xDC;
  constexpr auto DVL_VK_OEM_6 = 0xDD;
  constexpr auto DVL_VK_OEM_7 = 0xDE;
@@ -259,7 +262,7 @@ index cf4b054..f794897 100644
  //constexpr auto DVL_VK_OEM_102 = 0xE2;
  
 diff --git a/SourceX/miniwin/misc_msg.cpp b/SourceX/miniwin/misc_msg.cpp
-index f39f53a..25aa29e 100644
+index c03983a..1ec60d4 100644
 --- a/SourceX/miniwin/misc_msg.cpp
 +++ b/SourceX/miniwin/misc_msg.cpp
 @@ -74,6 +74,12 @@ static int translate_sdl_key(SDL_Keysym key)

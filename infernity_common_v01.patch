@@ -2,11 +2,13 @@ Common helper function for Infernity patches.
 
 CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
 
+Rebased on devilutionX 0.3.1.
+
 diff --git a/Source/engine.cpp b/Source/engine.cpp
-index 2474973..487ff83 100644
+index 7911ceb..77d80f4 100644
 --- a/Source/engine.cpp
 +++ b/Source/engine.cpp
-@@ -581,6 +581,24 @@ void CelDecDatLightTrans(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nW
+@@ -571,6 +571,24 @@ L_ODD:
  }
  // 69BEF8: using guessed type int light_table_index;
  
@@ -28,19 +30,19 @@ index 2474973..487ff83 100644
 +	return l;
 +}
 +
- void CelDecodeLightOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth)
+ void __fastcall CelDecodeLightOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth)
  {
  	int nDataSize;
 diff --git a/Source/engine.h b/Source/engine.h
-index ba1095e..8aa041a 100644
+index 7c5352b..4a429e9 100644
 --- a/Source/engine.h
 +++ b/Source/engine.h
-@@ -18,6 +18,8 @@ void CelDrawHdrOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, int Ce
- void CelDecodeHdrOnly(BYTE *pBuff, BYTE *pCelBuff, int nCel, int nWidth, int CelSkip, int CelCap);
- void CelDecDatLightOnly(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nWidth);
- void CelDecDatLightTrans(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nWidth);
+@@ -18,6 +18,8 @@ void __fastcall CelDrawHdrOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWi
+ void __fastcall CelDecodeHdrOnly(BYTE *pBuff, BYTE *pCelBuff, int nCel, int nWidth, int always_0, int dir);
+ void __fastcall CelDecDatLightOnly(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nWidth);
+ void __fastcall CelDecDatLightTrans(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nWidth);
 +void DrawSolidRectangle(int x0, int dx, int y0, int dy, int color);
 +int CalculateTextWidth(char* s);
- void CelDecodeLightOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth);
- void CelDecodeHdrLightOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, int CelSkip, int CelCap);
- void CelDecodeHdrLightTrans(BYTE *pBuff, BYTE *pCelBuff, int nCel, int nWidth, int CelSkip, int CelCap);
+ void __fastcall CelDecodeLightOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth);
+ void __fastcall CelDecodeHdrLightOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, int always_0, int dir);
+ void __fastcall CelDecodeHdrLightTrans(BYTE *pBuff, BYTE *pCelBuff, int nCel, int nWidth, int always_0, int dir);

@@ -2,11 +2,13 @@ Minimal left mouse button auto clicker.
 
 Note: track_repeat_walk has not been renamed to avoid unnecessary changes.
 
+Rebased on devilutionX 0.3.1.
+
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 787b8a4..e26c418 100644
+index e3a3c67..15a1f84 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
-@@ -876,8 +876,10 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -853,8 +853,10 @@ BOOL __fastcall LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, invflag ? CMD_GOTOGETITEM : CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
  		if (pcursmonst != -1)
  			NetSendCmdLocParam1(TRUE, CMD_TALKXY, cursmx, cursmy, pcursmonst);
@@ -18,7 +20,7 @@ index 787b8a4..e26c418 100644
  	} else {
  		bNear = abs(plr[myplr].WorldX - cursmx) < 2 && abs(plr[myplr].WorldY - cursmy) < 2;
  		if (pcursitem != -1 && pcurs == CURSOR_HAND && !bShift) {
-@@ -886,12 +888,15 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -863,12 +865,15 @@ BOOL __fastcall LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, pcurs == CURSOR_DISARM ? CMD_DISARMXY : CMD_OPOBJXY, cursmx, cursmy, pcursobj);
  		} else if (plr[myplr]._pwtype == WT_RANGED) {
  			if (bShift) {
@@ -37,7 +39,7 @@ index 787b8a4..e26c418 100644
  				}
  			} else if (pcursplr != -1 && !FriendlyMode) {
  				NetSendCmdParam1(TRUE, CMD_RATTACKPID, pcursplr);
-@@ -900,21 +905,27 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -877,21 +882,27 @@ BOOL __fastcall LeftMouseCmd(BOOL bShift)
  			if (bShift) {
  				if (pcursmonst != -1) {
  					if (CanTalkToMonst(pcursmonst)) {
@@ -71,7 +73,7 @@ index 787b8a4..e26c418 100644
  
  	return FALSE;
 diff --git a/Source/track.cpp b/Source/track.cpp
-index 38245a0..373beb3 100644
+index 062cd82..2f589a6 100644
 --- a/Source/track.cpp
 +++ b/Source/track.cpp
 @@ -7,6 +7,8 @@ DEVILUTION_BEGIN_NAMESPACE
@@ -81,9 +83,9 @@ index 38245a0..373beb3 100644
 +static BYTE sgbCommand;
 +static WORD sgwParam1;
  
- void track_process()
+ void __cdecl track_process()
  {
-@@ -16,20 +18,47 @@ void track_process()
+@@ -16,20 +18,47 @@ void __cdecl track_process()
  	if (cursmx < 0 || cursmx >= MAXDUNX - 1 || cursmy < 0 || cursmy >= MAXDUNY - 1)
  		return;
  
@@ -132,10 +134,10 @@ index 38245a0..373beb3 100644
 +	sgwParam1 = wParam1;
 +}
 +
- void track_repeat_walk(BOOL rep)
+ void __fastcall track_repeat_walk(BOOL rep)
  {
  	if (sgbIsWalking == rep)
-@@ -39,7 +68,6 @@ void track_repeat_walk(BOOL rep)
+@@ -39,7 +68,6 @@ void __fastcall track_repeat_walk(BOOL rep)
  	if (rep) {
  		sgbIsScrolling = 0;
  		sgdwLastWalk = GetTickCount() - 50;
@@ -144,15 +146,15 @@ index 38245a0..373beb3 100644
  		sgbIsScrolling = 0;
  	}
 diff --git a/Source/track.h b/Source/track.h
-index a2a2506..e8e912f 100644
+index 3b127a1..8e95dc2 100644
 --- a/Source/track.h
 +++ b/Source/track.h
 @@ -3,6 +3,8 @@
  #define __TRACK_H__
  
- void track_process();
+ void __cdecl track_process();
 +void track_lmb_loc(BYTE bCmd, BYTE x, BYTE y);
 +void track_lmb_param1(BYTE bCmd, WORD wParam1);
- void track_repeat_walk(BOOL rep);
- BOOL track_isscrolling();
+ void __fastcall track_repeat_walk(BOOL rep);
+ BOOL __cdecl track_isscrolling();
  

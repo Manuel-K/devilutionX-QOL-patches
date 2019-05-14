@@ -2,11 +2,13 @@ Minimal smooth run in town modification.
 
 Inspired by Hellfire and patch by sergi4ua <sergiy4ua@gmail.com>
 
+Rebased on devilutionX 0.3.1.
+
 diff --git a/Source/player.cpp b/Source/player.cpp
-index 020e3d7..9b680ec 100644
+index ab9d92d..aa89dbc 100644
 --- a/Source/player.cpp
 +++ b/Source/player.cpp
-@@ -1197,11 +1197,24 @@ void PM_ChangeOffset(int pnum)
+@@ -1197,11 +1197,24 @@ void __fastcall PM_ChangeOffset(int pnum)
  	}
  
  	plr[pnum]._pVar8++;

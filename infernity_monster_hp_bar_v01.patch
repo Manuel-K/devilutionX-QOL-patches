@@ -9,22 +9,24 @@ Self censoring can be disabled by setting cheat to true.
 
 Based on Infernity by quendel, extracted by sergi4ua.
 
+Rebased on devilutionX 0.3.1.
+
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 51ca254..fe8795e 100644
+index c55998f..972734c 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
-@@ -2,6 +2,8 @@
- 
- #include "../types.h"
+@@ -6,6 +6,8 @@
+ #include <vector>
+ #include <map>
  
 +#include <sstream>
 +
  DEVILUTION_BEGIN_NAMESPACE
  
  int light_table_index; // weak
-@@ -427,6 +435,9 @@ void DrawView(int StartX, int StartY)
+@@ -428,6 +430,9 @@ void __fastcall DrawView(int StartX, int StartY)
+ 	else if (PauseMode)
  		gmenu_draw_pause();
- 	}
  
 +	if (pcursmonst != -1) {
 +		DrawMonsterHealthBar(pcursmonst);
@@ -32,7 +34,7 @@ index 51ca254..fe8795e 100644
  	DrawPlrMsg();
  	gmenu_draw();
  	doom_draw();
-@@ -550,6 +561,129 @@ void DrawGame(int x, int y)
+@@ -566,6 +571,129 @@ void __fastcall DrawGame(int x, int y)
  // 69CF0C: using guessed type int gpBufEnd;
  // 69CF20: using guessed type char arch_draw_type;
  
@@ -159,18 +161,19 @@ index 51ca254..fe8795e 100644
 +	}
 +}
 +
- void scrollrt_draw_lower(int x, int y, int sx, int sy, int chunks, int eflag)
+ void __fastcall scrollrt_draw_lower(int x, int y, int sx, int sy, int a5, int some_flag)
  {
- 	int i, j;
+ 	unsigned int v6;    // edi
 diff --git a/Source/scrollrt.h b/Source/scrollrt.h
-index 1466a7b..c3871c2 100644
+index 48a6405..f07813e 100644
 --- a/Source/scrollrt.h
 +++ b/Source/scrollrt.h
-@@ -21,6 +21,7 @@ void DrawPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuff, int nCel
- void DrawClippedPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuff, int nCel, int nWidth, int CelSkip, int capChunks);
- void DrawView(int StartX, int StartY);
- void DrawGame(int x, int y);
+@@ -21,6 +21,7 @@ void __fastcall DrawPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuf
+ void __fastcall DrawClippedPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuff, int nCel, int nWidth, int a9, int a10);
+ void __fastcall DrawView(int StartX, int StartY);
+ void __fastcall DrawGame(int x, int y);
 +void DrawMonsterHealthBar(int monsterID);
- void scrollrt_draw_lower(int x, int y, int sx, int sy, int chunks, int eflag);
- void scrollrt_draw_clipped_dungeon(BYTE *pBuff, int sx, int sy, int dx, int dy, int eflag);
- void DrawClippedMonster(int x, int y, int mx, int my, int m, int CelSkip, int capChunks);
+ void __fastcall scrollrt_draw_lower(int x, int y, int sx, int sy, int a5, int some_flag);
+ void __fastcall scrollrt_draw_clipped_dungeon(char *a1, int sx, int sy, int a4, int a5, int a6);
+ void __fastcall DrawClippedMonster(int x, int y, int mx, int my, int m, int a6, int a7);
+

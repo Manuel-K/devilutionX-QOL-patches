@@ -1,16 +1,18 @@
 Add some text to version string in main menu to indicate
 that this is a modified version.
 
+Rebased on devilutionX 0.3.1.
+
 diff --git a/Source/mainmenu.cpp b/Source/mainmenu.cpp
-index e52ddb9..6eb7439 100644
+index 7bed263..0979196 100644
 --- a/Source/mainmenu.cpp
 +++ b/Source/mainmenu.cpp
-@@ -93,7 +93,7 @@ void mainmenu_loop()
+@@ -93,7 +93,7 @@ void __cdecl mainmenu_loop()
  
  	do {
  		menu = 0;
 -		if (!UiMainMenuDialog("Diablo v1.09", &menu, effects_play_sound, 30))
 +		if (!UiMainMenuDialog("Diablo v1.09 with QOL changes", &menu, effects_play_sound, 30))
- 			app_fatal("Unable to display mainmenu");
+ 			TermMsg("Unable to display mainmenu");
  
  		switch (menu) {
