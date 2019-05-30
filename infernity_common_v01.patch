@@ -3,10 +3,10 @@ Common helper function for Infernity patches.
 CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/engine.cpp b/Source/engine.cpp
-index 2474973..487ff83 100644
+index 3822897..5ceac3d 100644
 --- a/Source/engine.cpp
 +++ b/Source/engine.cpp
-@@ -581,6 +581,24 @@ void CelDecDatLightTrans(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nW
+@@ -580,6 +580,24 @@ void CelDecDatLightTrans(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nW
  }
  // 69BEF8: using guessed type int light_table_index;
  
@@ -32,7 +32,7 @@ index 2474973..487ff83 100644
  {
  	int nDataSize;
 diff --git a/Source/engine.h b/Source/engine.h
-index ba1095e..8aa041a 100644
+index 74f038b..740ab19 100644
 --- a/Source/engine.h
 +++ b/Source/engine.h
 @@ -18,6 +18,8 @@ void CelDrawHdrOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, int Ce
