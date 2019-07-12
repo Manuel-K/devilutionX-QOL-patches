@@ -10,7 +10,7 @@ Self censoring can be disabled by setting cheat to true.
 Based on Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 1b912ca..6c85409 100644
+index 87b861fa..b7496def 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
 @@ -1,6 +1,8 @@
@@ -163,7 +163,7 @@ index 1b912ca..6c85409 100644
  {
  	int i, j;
 diff --git a/Source/scrollrt.h b/Source/scrollrt.h
-index baeac29..0340778 100644
+index 3510660c..cda76062 100644
 --- a/Source/scrollrt.h
 +++ b/Source/scrollrt.h
 @@ -21,6 +21,7 @@ void DrawPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuff, int nCel

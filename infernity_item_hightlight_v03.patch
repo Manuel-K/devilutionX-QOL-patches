@@ -5,7 +5,7 @@ Some refactoring and cleaning applied.
 From Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index eb44623..a5301c5 100644
+index feb5644b..1296ff19 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
 @@ -16,6 +16,7 @@ BOOL gbRunGame;
@@ -16,27 +16,27 @@ index eb44623..a5301c5 100644
  BOOL gbProcessPlayers;
  int glEndSeed[NUMLEVELS];
  BOOL gbLoadGame;
-@@ -1066,6 +1067,9 @@ void ReleaseKey(int vkey)
+@@ -1034,6 +1035,9 @@ void ReleaseKey(int vkey)
  {
  	if (vkey == VK_SNAPSHOT)
  		CaptureScreen();
 +
-+	if (vkey == 0x12)
++	if (vkey == VK_MENU || vkey == VK_LMENU || vkey == VK_RMENU)
 +		drawitems = false;
  }
  
  void PressKey(int vkey)
-@@ -1233,6 +1237,8 @@ void PressKey(int vkey)
- 		if(stextflag) {
+@@ -1201,6 +1205,8 @@ void PressKey(int vkey)
+ 		if (stextflag) {
  			STextNext();
  		}
-+	} else if(vkey == 0x12) {
++	} else if(vkey == VK_MENU || vkey == VK_LMENU || vkey == VK_RMENU) {
 +		drawitems = true;
- 	} else if(vkey == VK_LEFT) {
- 		if(automapflag && !talkflag) {
+ 	} else if (vkey == VK_LEFT) {
+ 		if (automapflag && !talkflag) {
  			AutomapLeft();
 diff --git a/Source/diablo.h b/Source/diablo.h
-index c26a505..558c90c 100644
+index f80160d0..75f03257 100644
 --- a/Source/diablo.h
 +++ b/Source/diablo.h
 @@ -95,6 +95,7 @@ extern BOOL gbRunGame;
@@ -48,7 +48,7 @@ index c26a505..558c90c 100644
  extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 1b912ca..a5b8413 100644
+index 87b861fa..a4d32cac 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
 @@ -1,6 +1,10 @@
@@ -66,14 +66,14 @@ index 1b912ca..a5b8413 100644
  
  	DrawDurIcon();
  
-+	if(drawitems) {
++	if (drawitems) {
 +		HighlightItemsNameOnMap();
 +	}
 +
- 	if(chrflag) {
+ 	if (chrflag) {
  		DrawChr();
- 	} else if(questlog) {
-@@ -1358,6 +1366,145 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
+ 	} else if (questlog) {
+@@ -1360,6 +1368,145 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
  	}
  }
  
@@ -220,7 +220,7 @@ index 1b912ca..a5b8413 100644
  {
  	int lti_old, cta_old, lpi_old;
 diff --git a/Source/scrollrt.h b/Source/scrollrt.h
-index baeac29..80fe7e6 100644
+index 3510660c..544701c2 100644
 --- a/Source/scrollrt.h
 +++ b/Source/scrollrt.h
 @@ -28,6 +28,7 @@ void DrawClippedObject(int x, int y, int ox, int oy, BOOL pre, int CelSkip, int
@@ -228,50 +228,20 @@ index baeac29..80fe7e6 100644
  void scrollrt_draw_lower_2(int x, int y, int sx, int sy, int chunks, int skipChunks, int eflag);
  void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks, int CelSkip, int dx, int dy, int eflag);
 +void HighlightItemsNameOnMap();
- void scrollrt_draw_clipped_e_flag_2(BYTE *pBuff, int x, int y, int skipChunks, signed int CelSkip, int sx, int sy);
+ void scrollrt_draw_clipped_e_flag_2(BYTE *pBuff, int x, int y, int skipChunks, int CelSkip, int sx, int sy);
  void scrollrt_draw_upper(int x, int y, int sx, int sy, int chunks, int capChunks, int eflag);
  void scrollrt_draw_dungeon(BYTE *pBuff, int sx, int sy, int capChunks, int CelCap, int dx, int dy, int eflag);
 diff --git a/Source/town.cpp b/Source/town.cpp
-index 6bb1385..2b56405 100644
+index 91ab97b4..6faad34a 100644
 --- a/Source/town.cpp
 +++ b/Source/town.cpp
-@@ -1015,6 +1015,9 @@ void T_DrawView(int StartX, int StartY)
- 		DrawDiabloMsg();
- 	if (PauseMode && !deathflag)
+@@ -1260,6 +1260,9 @@ void T_DrawView(int StartX, int StartY)
  		gmenu_draw_pause();
+ 	}
+ 
 +	if(drawitems) {
 +		HighlightItemsNameOnMap();
 +	}
  	DrawPlrMsg();
  	gmenu_draw();
  	doom_draw();
-diff --git a/SourceS/miniwin/misc.h b/SourceS/miniwin/misc.h
-index cf4b054..f794897 100644
---- a/SourceS/miniwin/misc.h
-+++ b/SourceS/miniwin/misc.h
-@@ -763,6 +763,8 @@ constexpr auto DVL_VK_OEM_4 = 0xDB;
- constexpr auto DVL_VK_OEM_5 = 0xDC;
- constexpr auto DVL_VK_OEM_6 = 0xDD;
- constexpr auto DVL_VK_OEM_7 = 0xDE;
-+
-+constexpr auto DVL_VK_MENU = 0x12;
- //constexpr auto DVL_VK_OEM_8 = 0xDF;
- //constexpr auto DVL_VK_OEM_102 = 0xE2;
- 
-diff --git a/SourceX/miniwin/misc_msg.cpp b/SourceX/miniwin/misc_msg.cpp
-index f39f53a..25aa29e 100644
---- a/SourceX/miniwin/misc_msg.cpp
-+++ b/SourceX/miniwin/misc_msg.cpp
-@@ -74,6 +74,12 @@ static int translate_sdl_key(SDL_Keysym key)
- 	case SDLK_PRINTSCREEN:
- 		return DVL_VK_SNAPSHOT;
- 
-+	case SDLK_MENU:
-+		return DVL_VK_MENU;
-+
-+	case 0x400000E2:
-+		return DVL_VK_MENU;
-+
- 	default:
- 		if (sym >= SDLK_a && sym <= SDLK_z) {
- 			return 'A' + (sym - SDLK_a);

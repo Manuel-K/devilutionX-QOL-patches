@@ -3,12 +3,12 @@ Common helper function for Infernity patches.
 CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/engine.cpp b/Source/engine.cpp
-index 3822897..5ceac3d 100644
+index 14260e4a..1076344c 100644
 --- a/Source/engine.cpp
 +++ b/Source/engine.cpp
-@@ -580,6 +580,24 @@ void CelDecDatLightTrans(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nW
+@@ -578,6 +578,24 @@ void CelDecDatLightTrans(BYTE *pDecodeTo, BYTE *pRLEBytes, int nDataSize, int nW
+ #endif
  }
- // 69BEF8: using guessed type int light_table_index;
  
 +void DrawSolidRectangle(int x0, int dx, int y0, int dy, int color) {
 +	char* WorkingSurface = (char*)gpBuffer;
@@ -32,7 +32,7 @@ index 3822897..5ceac3d 100644
  {
  	int nDataSize;
 diff --git a/Source/engine.h b/Source/engine.h
-index 74f038b..740ab19 100644
+index ba29eb01..836599b2 100644
 --- a/Source/engine.h
 +++ b/Source/engine.h
 @@ -18,6 +18,8 @@ void CelDrawHdrOnly(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, int Ce

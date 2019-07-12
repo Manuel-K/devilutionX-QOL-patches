@@ -2,10 +2,10 @@ Add some text to version string in main menu to indicate
 that this is a modified version.
 
 diff --git a/Source/mainmenu.cpp b/Source/mainmenu.cpp
-index fa551e2..d6195f3 100644
+index 52b50690..b2dd86fc 100644
 --- a/Source/mainmenu.cpp
 +++ b/Source/mainmenu.cpp
-@@ -93,7 +93,7 @@ void mainmenu_loop()
+@@ -92,7 +92,7 @@ void mainmenu_loop()
  
  	do {
  		menu = 0;
