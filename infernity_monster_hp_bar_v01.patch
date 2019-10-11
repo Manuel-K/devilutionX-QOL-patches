@@ -10,19 +10,18 @@ Self censoring can be disabled by setting cheat to true.
 Based on Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 87b861fa..b7496def 100644
+index 4e909955..47dd3231 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
-@@ -1,6 +1,8 @@
+@@ -1,5 +1,7 @@
  #include "diablo.h"
- #include "../3rdParty/Storm/Source/storm.h"
  
 +#include <sstream>
 +
  DEVILUTION_BEGIN_NAMESPACE
  
  int light_table_index;
-@@ -421,6 +423,9 @@ void DrawView(int StartX, int StartY)
+@@ -414,6 +416,9 @@ void DrawView(int StartX, int StartY)
  		gmenu_draw_pause();
  	}
  
@@ -32,7 +31,7 @@ index 87b861fa..b7496def 100644
  	DrawPlrMsg();
  	gmenu_draw();
  	doom_draw();
-@@ -531,6 +536,129 @@ void DrawGame(int x, int y)
+@@ -524,6 +529,129 @@ void DrawGame(int x, int y)
  	}
  }
  
@@ -163,10 +162,10 @@ index 87b861fa..b7496def 100644
  {
  	int i, j;
 diff --git a/Source/scrollrt.h b/Source/scrollrt.h
-index 3510660c..cda76062 100644
+index 87de3ad2..752f3216 100644
 --- a/Source/scrollrt.h
 +++ b/Source/scrollrt.h
-@@ -21,6 +21,7 @@ void DrawPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuff, int nCel
+@@ -20,6 +20,7 @@ void DrawPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuff, int nCel
  void DrawClippedPlayer(int pnum, int x, int y, int px, int py, BYTE *pCelBuff, int nCel, int nWidth, int CelSkip, int capChunks);
  void DrawView(int StartX, int StartY);
  void DrawGame(int x, int y);

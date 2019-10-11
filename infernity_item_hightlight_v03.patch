@@ -5,18 +5,18 @@ Some refactoring and cleaning applied.
 From Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 6205e03a..d8c7026f 100644
+index e61341f8..ac5ff0b2 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
 @@ -16,6 +16,7 @@ BOOL gbRunGame;
  int glMid3Seed[NUMLEVELS];
  BOOL gbRunGameResult;
- int zoomflag;
+ BOOL zoomflag;
 +bool drawitems;
  BOOL gbProcessPlayers;
  int glEndSeed[NUMLEVELS];
  BOOL gbLoadGame;
-@@ -1000,6 +1001,9 @@ void ReleaseKey(int vkey)
+@@ -838,6 +839,9 @@ void ReleaseKey(int vkey)
  {
  	if (vkey == VK_SNAPSHOT)
  		CaptureScreen();
@@ -26,7 +26,7 @@ index 6205e03a..d8c7026f 100644
  }
  
  void PressKey(int vkey)
-@@ -1167,6 +1171,8 @@ void PressKey(int vkey)
+@@ -1005,6 +1009,8 @@ void PressKey(int vkey)
  		if (stextflag) {
  			STextNext();
  		}
@@ -36,24 +36,23 @@ index 6205e03a..d8c7026f 100644
  		if (automapflag && !talkflag) {
  			AutomapLeft();
 diff --git a/Source/diablo.h b/Source/diablo.h
-index 6df7dfd4..a0076c77 100644
+index fd739a28..1d0184ad 100644
 --- a/Source/diablo.h
 +++ b/Source/diablo.h
-@@ -95,6 +95,7 @@ extern BOOL gbRunGame;
+@@ -97,6 +97,7 @@ extern BOOL gbRunGame;
  extern int glMid3Seed[NUMLEVELS];
  extern BOOL gbRunGameResult;
- extern int zoomflag;
+ extern BOOL zoomflag;
 +extern bool drawitems;
  extern BOOL gbProcessPlayers;
  extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 7c5954b0..486798c2 100644
+index 4e909955..ace04bf8 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
-@@ -1,6 +1,10 @@
+@@ -1,5 +1,9 @@
  #include "diablo.h"
- #include "../3rdParty/Storm/Source/storm.h"
  
 +#include <string>
 +#include <vector>
@@ -62,7 +61,7 @@ index 7c5954b0..486798c2 100644
  DEVILUTION_BEGIN_NAMESPACE
  
  int light_table_index;
-@@ -390,6 +394,10 @@ void DrawView(int StartX, int StartY)
+@@ -383,6 +387,10 @@ void DrawView(int StartX, int StartY)
  
  	DrawDurIcon();
  
@@ -73,7 +72,7 @@ index 7c5954b0..486798c2 100644
  	if (chrflag) {
  		DrawChr();
  	} else if (questlog) {
-@@ -1360,6 +1368,145 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
+@@ -1347,6 +1355,145 @@ void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks
  	}
  }
  
@@ -220,10 +219,10 @@ index 7c5954b0..486798c2 100644
  {
  	int lti_old, cta_old, lpi_old;
 diff --git a/Source/scrollrt.h b/Source/scrollrt.h
-index 982e7e48..2d2fc7c7 100644
+index 87de3ad2..0cecf76d 100644
 --- a/Source/scrollrt.h
 +++ b/Source/scrollrt.h
-@@ -28,6 +28,7 @@ void DrawClippedObject(int x, int y, int ox, int oy, BOOL pre, int CelSkip, int
+@@ -27,6 +27,7 @@ void DrawClippedObject(int x, int y, int ox, int oy, BOOL pre, int CelSkip, int
  void scrollrt_draw_clipped_e_flag(BYTE *pBuff, int x, int y, int sx, int sy);
  void scrollrt_draw_lower_2(int x, int y, int sx, int sy, int chunks, int skipChunks, int eflag);
  void scrollrt_draw_clipped_dungeon_2(BYTE *pBuff, int sx, int sy, int skipChunks, int CelSkip, int dx, int dy, int eflag);
@@ -232,10 +231,10 @@ index 982e7e48..2d2fc7c7 100644
  void scrollrt_draw_upper(int x, int y, int sx, int sy, int chunks, int capChunks, int eflag);
  void scrollrt_draw_dungeon(BYTE *pBuff, int sx, int sy, int capChunks, int CelCap, int dx, int dy, int eflag);
 diff --git a/Source/town.cpp b/Source/town.cpp
-index 54316d09..05d590ee 100644
+index 17de9a5d..4b47b086 100644
 --- a/Source/town.cpp
 +++ b/Source/town.cpp
-@@ -1260,6 +1260,9 @@ void T_DrawView(int StartX, int StartY)
+@@ -985,6 +985,9 @@ void T_DrawView(int StartX, int StartY)
  		gmenu_draw_pause();
  	}
  

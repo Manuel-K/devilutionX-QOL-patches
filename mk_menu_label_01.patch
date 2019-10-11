@@ -1,16 +1,16 @@
 Add some text to version string in main menu to indicate
 that this is a modified version.
 
-diff --git a/Source/mainmenu.cpp b/Source/mainmenu.cpp
-index 52b50690..b2dd86fc 100644
---- a/Source/mainmenu.cpp
-+++ b/Source/mainmenu.cpp
-@@ -92,7 +92,7 @@ void mainmenu_loop()
+diff --git a/Source/init.cpp b/Source/init.cpp
+index 24fd8318..dee847b1 100644
+--- a/Source/init.cpp
++++ b/Source/init.cpp
+@@ -20,7 +20,7 @@ HANDLE patch_rt_mpq;
+ /* data */
  
- 	do {
- 		menu = 0;
--		if (!UiMainMenuDialog("Diablo v1.09", &menu, effects_play_sound, 30))
-+		if (!UiMainMenuDialog("Diablo v1.09 with QOL changes", &menu, effects_play_sound, 30))
- 			app_fatal("Unable to display mainmenu");
+ char gszVersionNumber[MAX_PATH] = "internal version unknown";
+-char gszProductName[MAX_PATH] = "Diablo v1.09";
++char gszProductName[MAX_PATH] = "Diablo v1.09 with QOL changes";
  
- 		switch (menu) {
+ void init_cleanup()
+ {

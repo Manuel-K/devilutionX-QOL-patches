@@ -3,10 +3,10 @@ Minimal left mouse button auto clicker.
 Note: track_repeat_walk has not been renamed to avoid unnecessary changes.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index feb5644b..daf27be3 100644
+index e61341f8..836ed65e 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
-@@ -853,8 +853,10 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -678,8 +678,10 @@ BOOL LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, invflag ? CMD_GOTOGETITEM : CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
  		if (pcursmonst != -1)
  			NetSendCmdLocParam1(TRUE, CMD_TALKXY, cursmx, cursmy, pcursmonst);
@@ -18,7 +18,7 @@ index feb5644b..daf27be3 100644
  	} else {
  		bNear = abs(plr[myplr].WorldX - cursmx) < 2 && abs(plr[myplr].WorldY - cursmy) < 2;
  		if (pcursitem != -1 && pcurs == CURSOR_HAND && !bShift) {
-@@ -863,12 +865,15 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -688,12 +690,15 @@ BOOL LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, pcurs == CURSOR_DISARM ? CMD_DISARMXY : CMD_OPOBJXY, cursmx, cursmy, pcursobj);
  		} else if (plr[myplr]._pwtype == WT_RANGED) {
  			if (bShift) {
@@ -37,7 +37,7 @@ index feb5644b..daf27be3 100644
  				}
  			} else if (pcursplr != -1 && !FriendlyMode) {
  				NetSendCmdParam1(TRUE, CMD_RATTACKPID, pcursplr);
-@@ -877,21 +882,27 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -702,21 +707,27 @@ BOOL LeftMouseCmd(BOOL bShift)
  			if (bShift) {
  				if (pcursmonst != -1) {
  					if (CanTalkToMonst(pcursmonst)) {
@@ -71,10 +71,10 @@ index feb5644b..daf27be3 100644
  
  	return FALSE;
 diff --git a/Source/track.cpp b/Source/track.cpp
-index 5ad937bc..3e271cab 100644
+index 43162e73..4948829d 100644
 --- a/Source/track.cpp
 +++ b/Source/track.cpp
-@@ -6,6 +6,8 @@ DEVILUTION_BEGIN_NAMESPACE
+@@ -5,6 +5,8 @@ DEVILUTION_BEGIN_NAMESPACE
  static BYTE sgbIsScrolling;
  static DWORD sgdwLastWalk;
  static BOOL sgbIsWalking;
@@ -83,7 +83,7 @@ index 5ad937bc..3e271cab 100644
  
  void track_process()
  {
-@@ -15,20 +17,47 @@ void track_process()
+@@ -14,20 +16,47 @@ void track_process()
  	if (cursmx < 0 || cursmx >= MAXDUNX - 1 || cursmy < 0 || cursmy >= MAXDUNY - 1)
  		return;
  
@@ -135,7 +135,7 @@ index 5ad937bc..3e271cab 100644
  void track_repeat_walk(BOOL rep)
  {
  	if (sgbIsWalking == rep)
-@@ -38,7 +67,6 @@ void track_repeat_walk(BOOL rep)
+@@ -37,7 +66,6 @@ void track_repeat_walk(BOOL rep)
  	if (rep) {
  		sgbIsScrolling = 0;
  		sgdwLastWalk = GetTickCount() - 50;

@@ -3,10 +3,10 @@ Heavily minimized version of “play sfx when level up” by sergi4ua <sergiy4ua
 
 
 diff --git a/Source/player.cpp b/Source/player.cpp
-index 632aa024..22b925bc 100644
+index 6c2c35b1..3d816cfb 100644
 --- a/Source/player.cpp
 +++ b/Source/player.cpp
-@@ -722,6 +722,8 @@ void NextPlrLevel(int pnum)
+@@ -748,6 +748,8 @@ void NextPlrLevel(int pnum)
  	if (pnum == myplr) {
  		drawmanaflag = TRUE;
  	}
