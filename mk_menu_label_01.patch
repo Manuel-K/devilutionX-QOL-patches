@@ -2,7 +2,7 @@ Add some text to version string in main menu to indicate
 that this is a modified version.
 
 diff --git a/Source/init.cpp b/Source/init.cpp
-index 24fd8318..dee847b1 100644
+index 86f44d9a..b15a69b9 100644
 --- a/Source/init.cpp
 +++ b/Source/init.cpp
 @@ -20,7 +20,7 @@ HANDLE patch_rt_mpq;
