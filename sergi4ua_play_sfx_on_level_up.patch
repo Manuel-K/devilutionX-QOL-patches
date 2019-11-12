@@ -3,15 +3,14 @@ Heavily minimized version of “play sfx when level up” by sergi4ua <sergiy4ua
 
 
 diff --git a/Source/player.cpp b/Source/player.cpp
-index 3a6cac61..946290a5 100644
+index 3a6cac61..2c405255 100644
 --- a/Source/player.cpp
 +++ b/Source/player.cpp
-@@ -832,6 +832,8 @@ void AddPlrMonstExper(int lvl, int exp, char pmask)
- 		if (pmask & (1 << myplr))
- 			AddPlrExperience(myplr, lvl, e);
- 	}
-+
-+	PlaySFX(IS_QUESTDN);
- }
+@@ -747,6 +747,7 @@ void NextPlrLevel(int pnum)
  
- void InitPlayer(int pnum, BOOL FirstTime)
+ 	if (pnum == myplr) {
+ 		drawmanaflag = TRUE;
++		PlaySFX(IS_QUESTDN);
+ 	}
+ 
+ 	if (sgbControllerActive)
