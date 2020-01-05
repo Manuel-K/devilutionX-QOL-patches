@@ -19,7 +19,7 @@ index f73a7358..4433d436 100644
 +	}
 +}
 +
-+int CalculateTextWidth(char* s)
++int CalculateTextWidth(const char* s)
 +{
 +	int l = 0;
 +	while (*s) {
@@ -40,7 +40,7 @@ index 3255c778..36b3c081 100644
  void CelBlitOutline(char col, int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth);
  void ENG_set_pixel(int sx, int sy, BYTE col);
 +void DrawSolidRectangle(int x0, int dx, int y0, int dy, int color);
-+int CalculateTextWidth(char* s);
++int CalculateTextWidth(const char* s);
  void engine_draw_pixel(int sx, int sy);
  void DrawLine(int x0, int y0, int x1, int y1, BYTE col);
  int GetDirection(int x1, int y1, int x2, int y2);
