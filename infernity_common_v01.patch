@@ -3,7 +3,7 @@ Common helper function for Infernity patches.
 CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/engine.cpp b/Source/engine.cpp
-index 91c40672..3bad9ed3 100644
+index f73a7358..4433d436 100644
 --- a/Source/engine.cpp
 +++ b/Source/engine.cpp
 @@ -513,6 +513,24 @@ void engine_draw_pixel(int sx, int sy)
@@ -32,10 +32,10 @@ index 91c40672..3bad9ed3 100644
  // Except:
  // * not in view checks
 diff --git a/Source/engine.h b/Source/engine.h
-index 315943b7..38354ef3 100644
+index 3255c778..36b3c081 100644
 --- a/Source/engine.h
 +++ b/Source/engine.h
-@@ -58,6 +58,8 @@ void CelDrawLightRedSafe(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, c
+@@ -56,6 +56,8 @@ void CelDrawLightRedSafe(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, c
  void CelBlitWidth(BYTE *pBuff, int x, int y, int wdt, BYTE *pCelBuff, int nCel, int nWidth);
  void CelBlitOutline(char col, int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth);
  void ENG_set_pixel(int sx, int sy, BYTE col);

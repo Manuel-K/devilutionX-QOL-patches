@@ -5,10 +5,10 @@ Some refactoring and cleaning applied.
 From Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index ff1d5b3f..c5e273c2 100644
+index 8ee96262..bb17c0c8 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
-@@ -16,6 +16,7 @@ BOOL gbRunGame;
+@@ -17,6 +17,7 @@ BOOL gbRunGame;
  int glMid3Seed[NUMLEVELS];
  BOOL gbRunGameResult;
  BOOL zoomflag;
@@ -16,7 +16,7 @@ index ff1d5b3f..c5e273c2 100644
  BOOL gbProcessPlayers;
  int glEndSeed[NUMLEVELS];
  BOOL gbLoadGame;
-@@ -855,6 +856,9 @@ void ReleaseKey(int vkey)
+@@ -819,6 +820,9 @@ void ReleaseKey(int vkey)
  {
  	if (vkey == VK_SNAPSHOT)
  		CaptureScreen();
@@ -26,7 +26,7 @@ index ff1d5b3f..c5e273c2 100644
  }
  
  void PressKey(int vkey)
-@@ -1022,6 +1026,8 @@ void PressKey(int vkey)
+@@ -986,6 +990,8 @@ void PressKey(int vkey)
  		if (stextflag) {
  			STextNext();
  		}
@@ -36,7 +36,7 @@ index ff1d5b3f..c5e273c2 100644
  		if (automapflag && !talkflag) {
  			AutomapLeft();
 diff --git a/Source/diablo.h b/Source/diablo.h
-index b5b05a71..05382eb9 100644
+index aee94eac..e0130b78 100644
 --- a/Source/diablo.h
 +++ b/Source/diablo.h
 @@ -101,6 +101,7 @@ extern BOOL gbRunGame;
@@ -48,7 +48,7 @@ index b5b05a71..05382eb9 100644
  extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 151448c9..76ea7577 100644
+index 7df9f370..24ad71ca 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
 @@ -1,5 +1,9 @@
@@ -61,7 +61,7 @@ index 151448c9..76ea7577 100644
  DEVILUTION_BEGIN_NAMESPACE
  
  int light_table_index;
-@@ -537,6 +541,145 @@ static void DrawItem(int x, int y, int sx, int sy, BOOL pre)
+@@ -542,6 +546,145 @@ static void DrawItem(int x, int y, int sx, int sy, BOOL pre)
  	CelClippedDrawLight(px, sy, pItem->_iAnimData, pItem->_iAnimFrame, pItem->_iAnimWidth);
  }
  
@@ -207,7 +207,7 @@ index 151448c9..76ea7577 100644
  static void DrawMonsterHelper(int x, int y, int oy, int sx, int sy, int eflag)
  {
  	int mi, px, py;
-@@ -888,6 +1031,10 @@ void DrawView(int StartX, int StartY)
+@@ -893,6 +1036,10 @@ void DrawView(int StartX, int StartY)
  
  	DrawDurIcon();
  

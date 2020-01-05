@@ -3,7 +3,7 @@ Minimal smooth run in town modification.
 Inspired by Hellfire and patch by sergi4ua <sergiy4ua@gmail.com>
 
 diff --git a/Source/player.cpp b/Source/player.cpp
-index 3a6cac61..dad655ed 100644
+index 855abb54..0c67ae01 100644
 --- a/Source/player.cpp
 +++ b/Source/player.cpp
 @@ -1210,11 +1210,24 @@ void PM_ChangeOffset(int pnum)

@@ -3,10 +3,10 @@ Minimal left mouse button auto clicker.
 Note: track_repeat_walk has not been renamed to avoid unnecessary changes.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index ff1d5b3f..c4a456da 100644
+index 8ee96262..22c83d06 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
-@@ -695,8 +695,10 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -659,8 +659,10 @@ BOOL LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, invflag ? CMD_GOTOGETITEM : CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
  		if (pcursmonst != -1)
  			NetSendCmdLocParam1(TRUE, CMD_TALKXY, cursmx, cursmy, pcursmonst);
@@ -18,7 +18,7 @@ index ff1d5b3f..c4a456da 100644
  	} else {
  		bNear = abs(plr[myplr].WorldX - cursmx) < 2 && abs(plr[myplr].WorldY - cursmy) < 2;
  		if (pcursitem != -1 && pcurs == CURSOR_HAND && !bShift) {
-@@ -705,12 +707,15 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -669,12 +671,15 @@ BOOL LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, pcurs == CURSOR_DISARM ? CMD_DISARMXY : CMD_OPOBJXY, cursmx, cursmy, pcursobj);
  		} else if (plr[myplr]._pwtype == WT_RANGED) {
  			if (bShift) {
@@ -37,7 +37,7 @@ index ff1d5b3f..c4a456da 100644
  				}
  			} else if (pcursplr != -1 && !FriendlyMode) {
  				NetSendCmdParam1(TRUE, CMD_RATTACKPID, pcursplr);
-@@ -719,21 +724,27 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -683,21 +688,27 @@ BOOL LeftMouseCmd(BOOL bShift)
  			if (bShift) {
  				if (pcursmonst != -1) {
  					if (CanTalkToMonst(pcursmonst)) {
