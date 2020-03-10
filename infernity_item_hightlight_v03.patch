@@ -5,7 +5,7 @@ Some refactoring and cleaning applied.
 From Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 8ee96262..bb17c0c8 100644
+index 40f2d5d8..8d670122 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
 @@ -17,6 +17,7 @@ BOOL gbRunGame;
@@ -26,7 +26,7 @@ index 8ee96262..bb17c0c8 100644
  }
  
  void PressKey(int vkey)
-@@ -986,6 +990,8 @@ void PressKey(int vkey)
+@@ -992,6 +996,8 @@ void PressKey(int vkey)
  		if (stextflag) {
  			STextNext();
  		}
@@ -36,10 +36,10 @@ index 8ee96262..bb17c0c8 100644
  		if (automapflag && !talkflag) {
  			AutomapLeft();
 diff --git a/Source/diablo.h b/Source/diablo.h
-index aee94eac..e0130b78 100644
+index dd16dac4..e72d6f7c 100644
 --- a/Source/diablo.h
 +++ b/Source/diablo.h
-@@ -101,6 +101,7 @@ extern BOOL gbRunGame;
+@@ -13,6 +13,7 @@ extern BOOL gbRunGame;
  extern int glMid3Seed[NUMLEVELS];
  extern BOOL gbRunGameResult;
  extern BOOL zoomflag;
@@ -48,11 +48,11 @@ index aee94eac..e0130b78 100644
  extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 7df9f370..24ad71ca 100644
+index 5e4a1e18..5b5d5e73 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
 @@ -1,5 +1,9 @@
- #include "diablo.h"
+ #include "all.h"
  
 +#include <string>
 +#include <vector>
@@ -60,8 +60,8 @@ index 7df9f370..24ad71ca 100644
 +
  DEVILUTION_BEGIN_NAMESPACE
  
- int light_table_index;
-@@ -542,6 +546,145 @@ static void DrawItem(int x, int y, int sx, int sy, BOOL pre)
+ /**
+@@ -594,6 +598,145 @@ static void DrawItem(int x, int y, int sx, int sy, BOOL pre)
  	CelClippedDrawLight(px, sy, pItem->_iAnimData, pItem->_iAnimFrame, pItem->_iAnimWidth);
  }
  
@@ -204,10 +204,10 @@ index 7df9f370..24ad71ca 100644
 +	}
 +}
 +
- static void DrawMonsterHelper(int x, int y, int oy, int sx, int sy, int eflag)
- {
- 	int mi, px, py;
-@@ -893,6 +1036,10 @@ void DrawView(int StartX, int StartY)
+ /**
+  * @brief Check if and how a mosnter should be rendered
+  * @param y dPiece coordinate
+@@ -964,6 +1107,10 @@ void DrawView(int StartX, int StartY)
  
  	DrawDurIcon();
  

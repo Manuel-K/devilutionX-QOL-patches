@@ -3,7 +3,7 @@ Minimal left mouse button auto clicker.
 Note: track_repeat_walk has not been renamed to avoid unnecessary changes.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 8ee96262..22c83d06 100644
+index 40f2d5d8..374c8d9d 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
 @@ -659,8 +659,10 @@ BOOL LeftMouseCmd(BOOL bShift)
@@ -71,7 +71,7 @@ index 8ee96262..22c83d06 100644
  
  	return FALSE;
 diff --git a/Source/track.cpp b/Source/track.cpp
-index 43162e73..4948829d 100644
+index 829d5fa5..36f4b1b1 100644
 --- a/Source/track.cpp
 +++ b/Source/track.cpp
 @@ -5,6 +5,8 @@ DEVILUTION_BEGIN_NAMESPACE
@@ -92,7 +92,7 @@ index 43162e73..4948829d 100644
  		return;
  
  	if (cursmx != plr[myplr]._ptargx || cursmy != plr[myplr]._ptargy) {
- 		DWORD tick = GetTickCount();
+ 		DWORD tick = SDL_GetTicks();
  		if ((int)(tick - sgdwLastWalk) >= 300) {
  			sgdwLastWalk = tick;
 -			NetSendCmdLoc(TRUE, CMD_WALKXY, cursmx, cursmy);
@@ -138,7 +138,7 @@ index 43162e73..4948829d 100644
 @@ -37,7 +66,6 @@ void track_repeat_walk(BOOL rep)
  	if (rep) {
  		sgbIsScrolling = 0;
- 		sgdwLastWalk = GetTickCount() - 50;
+ 		sgdwLastWalk = SDL_GetTicks() - 50;
 -		NetSendCmdLoc(TRUE, CMD_WALKXY, cursmx, cursmy);
  	} else if (sgbIsScrolling) {
  		sgbIsScrolling = 0;

@@ -3,10 +3,10 @@ Common helper function for Infernity patches.
 CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/engine.cpp b/Source/engine.cpp
-index f73a7358..4433d436 100644
+index 5ff803df..cd553a42 100644
 --- a/Source/engine.cpp
 +++ b/Source/engine.cpp
-@@ -513,6 +513,24 @@ void engine_draw_pixel(int sx, int sy)
+@@ -632,6 +632,24 @@ void engine_draw_pixel(int sx, int sy)
  		*dst = gbPixelCol;
  }
  
@@ -28,11 +28,11 @@ index f73a7358..4433d436 100644
 +	return l;
 +}
 +
- // Exact copy from https://github.com/erich666/GraphicsGems/blob/dad26f941e12c8bf1f96ea21c1c04cd2206ae7c9/gems/DoubleLine.c
- // Except:
- // * not in view checks
+ #define GG_SWAP(A, B) \
+ 	{                 \
+ 		(A) ^= (B);   \
 diff --git a/Source/engine.h b/Source/engine.h
-index 3255c778..36b3c081 100644
+index 3255c778..025f60ee 100644
 --- a/Source/engine.h
 +++ b/Source/engine.h
 @@ -56,6 +56,8 @@ void CelDrawLightRedSafe(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, c

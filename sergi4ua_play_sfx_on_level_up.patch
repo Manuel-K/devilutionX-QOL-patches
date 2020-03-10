@@ -3,7 +3,7 @@ Heavily minimized version of “play sfx when level up” by sergi4ua <sergiy4ua
 
 
 diff --git a/Source/player.cpp b/Source/player.cpp
-index 855abb54..3cc695ca 100644
+index 21c234cd..844131be 100644
 --- a/Source/player.cpp
 +++ b/Source/player.cpp
 @@ -747,6 +747,7 @@ void NextPlrLevel(int pnum)
