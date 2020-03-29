@@ -3,7 +3,7 @@ Common helper function for Infernity patches.
 CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/engine.cpp b/Source/engine.cpp
-index 5ff803df..cd553a42 100644
+index e2696005..679cfbe9 100644
 --- a/Source/engine.cpp
 +++ b/Source/engine.cpp
 @@ -632,6 +632,24 @@ void engine_draw_pixel(int sx, int sy)
@@ -28,9 +28,9 @@ index 5ff803df..cd553a42 100644
 +	return l;
 +}
 +
- #define GG_SWAP(A, B) \
- 	{                 \
- 		(A) ^= (B);   \
+ /**
+  * @brief Draw a line on the back buffer
+  * @param x0 Back buffer coordinate
 diff --git a/Source/engine.h b/Source/engine.h
 index 3255c778..025f60ee 100644
 --- a/Source/engine.h
