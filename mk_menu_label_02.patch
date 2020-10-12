@@ -2,10 +2,10 @@ Add some text to version string in main menu to indicate
 that this is a modified version.
 
 diff --git a/Source/init.cpp b/Source/init.cpp
-index 00a01dc8..b04479fe 100644
+index e9a48891..43bea6c5 100644
 --- a/Source/init.cpp
 +++ b/Source/init.cpp
-@@ -110,7 +110,7 @@ HANDLE init_test_access(char *mpq_path, char *mpq_name, char *reg_loc, int dwPri
+@@ -122,7 +122,7 @@ HANDLE init_test_access(char *mpq_path, char *mpq_name, char *reg_loc, int dwPri
  
  void init_get_file_info()
  {

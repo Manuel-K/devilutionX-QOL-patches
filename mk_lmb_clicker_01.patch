@@ -3,10 +3,10 @@ Minimal left mouse button auto clicker.
 Note: track_repeat_walk has not been renamed to avoid unnecessary changes.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 40f2d5d8..374c8d9d 100644
+index 6d53647b..67f3f79d 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
-@@ -659,8 +659,10 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -715,8 +715,10 @@ BOOL LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, invflag ? CMD_GOTOGETITEM : CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
  		if (pcursmonst != -1)
  			NetSendCmdLocParam1(TRUE, CMD_TALKXY, cursmx, cursmy, pcursmonst);
@@ -16,9 +16,9 @@ index 40f2d5d8..374c8d9d 100644
  			return TRUE;
 +		}
  	} else {
- 		bNear = abs(plr[myplr].WorldX - cursmx) < 2 && abs(plr[myplr].WorldY - cursmy) < 2;
+ 		bNear = abs(plr[myplr]._px - cursmx) < 2 && abs(plr[myplr]._py - cursmy) < 2;
  		if (pcursitem != -1 && pcurs == CURSOR_HAND && !bShift) {
-@@ -669,12 +671,15 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -725,12 +727,15 @@ BOOL LeftMouseCmd(BOOL bShift)
  			NetSendCmdLocParam1(TRUE, pcurs == CURSOR_DISARM ? CMD_DISARMXY : CMD_OPOBJXY, cursmx, cursmy, pcursobj);
  		} else if (plr[myplr]._pwtype == WT_RANGED) {
  			if (bShift) {
@@ -37,7 +37,7 @@ index 40f2d5d8..374c8d9d 100644
  				}
  			} else if (pcursplr != -1 && !FriendlyMode) {
  				NetSendCmdParam1(TRUE, CMD_RATTACKPID, pcursplr);
-@@ -683,21 +688,27 @@ BOOL LeftMouseCmd(BOOL bShift)
+@@ -739,21 +744,27 @@ BOOL LeftMouseCmd(BOOL bShift)
  			if (bShift) {
  				if (pcursmonst != -1) {
  					if (CanTalkToMonst(pcursmonst)) {
@@ -71,10 +71,10 @@ index 40f2d5d8..374c8d9d 100644
  
  	return FALSE;
 diff --git a/Source/track.cpp b/Source/track.cpp
-index 829d5fa5..36f4b1b1 100644
+index 8bb6b3d3..3a51992c 100644
 --- a/Source/track.cpp
 +++ b/Source/track.cpp
-@@ -5,6 +5,8 @@ DEVILUTION_BEGIN_NAMESPACE
+@@ -10,6 +10,8 @@ DEVILUTION_BEGIN_NAMESPACE
  static BYTE sgbIsScrolling;
  static DWORD sgdwLastWalk;
  static BOOL sgbIsWalking;
@@ -83,7 +83,7 @@ index 829d5fa5..36f4b1b1 100644
  
  void track_process()
  {
-@@ -14,20 +16,47 @@ void track_process()
+@@ -19,20 +21,47 @@ void track_process()
  	if (cursmx < 0 || cursmx >= MAXDUNX - 1 || cursmy < 0 || cursmy >= MAXDUNY - 1)
  		return;
  
@@ -97,7 +97,7 @@ index 829d5fa5..36f4b1b1 100644
  			sgdwLastWalk = tick;
 -			NetSendCmdLoc(TRUE, CMD_WALKXY, cursmx, cursmy);
 -			if (!sgbIsScrolling)
--				sgbIsScrolling = 1;
+-				sgbIsScrolling = TRUE;
 +			switch (sgbCommand) {
 +				case CMD_WALKXY:
 +					NetSendCmdLoc(TRUE, CMD_WALKXY, cursmx, cursmy);
@@ -135,20 +135,20 @@ index 829d5fa5..36f4b1b1 100644
  void track_repeat_walk(BOOL rep)
  {
  	if (sgbIsWalking == rep)
-@@ -37,7 +66,6 @@ void track_repeat_walk(BOOL rep)
+@@ -42,7 +71,6 @@ void track_repeat_walk(BOOL rep)
  	if (rep) {
- 		sgbIsScrolling = 0;
+ 		sgbIsScrolling = FALSE;
  		sgdwLastWalk = SDL_GetTicks() - 50;
 -		NetSendCmdLoc(TRUE, CMD_WALKXY, cursmx, cursmy);
  	} else if (sgbIsScrolling) {
- 		sgbIsScrolling = 0;
+ 		sgbIsScrolling = FALSE;
  	}
 diff --git a/Source/track.h b/Source/track.h
-index a2a2506c..e8e912f9 100644
+index 14f396ab..08975af3 100644
 --- a/Source/track.h
 +++ b/Source/track.h
-@@ -3,6 +3,8 @@
- #define __TRACK_H__
+@@ -13,6 +13,8 @@ extern "C" {
+ #endif
  
  void track_process();
 +void track_lmb_loc(BYTE bCmd, BYTE x, BYTE y);

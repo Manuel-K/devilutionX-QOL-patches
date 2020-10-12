@@ -4,16 +4,18 @@ Modifications by Manuel-K:
 - cleanup and refactoring
 - hide elemental damage info if less than 15 kills (optional)
 - hide exact hp if less than 30 kills (optional)
+- de-hardcode positions
 
-Self censoring can be disabled by setting cheat to true.
+Self censoring can be disabled by setting cheat to TRUE.
 
 Based on Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 5e4a1e18..83f59698 100644
+index b8fa4626..5ff4c8c3 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
-@@ -1,5 +1,7 @@
+@@ -5,6 +5,8 @@
+  */
  #include "all.h"
  
 +#include <sstream>
@@ -21,24 +23,23 @@ index 5e4a1e18..83f59698 100644
  DEVILUTION_BEGIN_NAMESPACE
  
  /**
-@@ -943,6 +945,133 @@ static void DrawGame(int x, int y)
+@@ -1156,6 +1158,130 @@ static void DrawGame(int x, int y)
  // DevilutionX extension.
  extern void DrawControllerModifierHints();
  
 +void DrawMonsterHealthBar(int monsterID)
 +{
-+	static const int yPos = 180;
-+	static const int width = 250;
-+	static const int ScreenWidth = 640;
-+	static const int Screen_LeftBorder = 64;
-+	static const int xPos = (ScreenWidth) / 2 - Screen_LeftBorder;
++	static const int yPos = 10;
 +	static const int height = 25;
++	static const int width = 250;
++	static const int xCenter = (SCREEN_WIDTH) / 2 + 1; // centered between orbs
++	static const int xPos = xCenter - width / 2;
 +	static const int xOffset = 0;
 +	static const int yOffset = 0; // was 1
 +	static const int borderWidth = 2;
-+	static const int borderColors[] = { 242/*undead*/,232/*demon*/,182/*beast*/ };
++	static const int borderColors[] = { 242/*undead*/, 232/*demon*/, 182/*beast*/ };
 +	static const int filledColor = 142; // optimum balance in bright red between dark and light
-+	static const bool fillCorners = true;
++	static const bool fillCorners = TRUE;
 +	static const int square = 10;
 +	static const char* immuText = "IMMU: ";
 +	static const char* resText = "RES: ";
@@ -47,7 +48,7 @@ index 5e4a1e18..83f59698 100644
 +	static const int resistColors[] = { 148, 140, 129 };
 +	static const unsigned short immunes[] = { 0x8, 0x10, 0x20 };
 +	static const unsigned short resists[] = { 0x1, 0x2, 0x4 };
-+	static const bool cheat = false;
++	static const bool cheat = FALSE;
 +
 +	if (!monster[monsterID].MData) {
 +		return;
@@ -90,76 +91,74 @@ index 5e4a1e18..83f59698 100644
 +
 +	static const int cornerMod = fillCorners ? borderWidth : 0;
 +	static const int x0 = xPos - xOffset;
++	static const int x1 = xPos + xOffset + width;
 +	static const int dx = width + 2*xOffset + cornerMod;
 +	static const int y0 = yPos - yOffset;
++	static const int y1 = yPos + yOffset + height;
 +	static const int dy = height + 2*yOffset + cornerMod;
-+	DrawSolidRectangle(x0 - cornerMod, dx, yPos - yOffset - borderWidth, borderWidth, borderColor);
-+	DrawSolidRectangle(x0            , dx, yPos + yOffset + height,      borderWidth, borderColor);
-+	DrawSolidRectangle(xPos - xOffset - borderWidth, borderWidth, y0,             dy, borderColor);
-+	DrawSolidRectangle(xPos + xOffset + width,       borderWidth, y0 - cornerMod, dy, borderColor);
++	DrawSolidRectangle(x0 - cornerMod, dx, y0 - borderWidth, borderWidth, borderColor);
++	DrawSolidRectangle(x0            , dx, y1,               borderWidth, borderColor);
++	DrawSolidRectangle(x0 - borderWidth, borderWidth, y0,             dy, borderColor);
++	DrawSolidRectangle(x1,               borderWidth, y0 - cornerMod, dy, borderColor);
 +
-+	bool drawImmu = false;
++	bool drawImmu = FALSE;
 +	if (showDamageModifiers) {
 +		int immuOffset = 0 + CalculateTextWidth(immuText) - 5;
 +		for (int k = 0; k < resSize; ++k) {
 +			if (!(mres & immunes[k])) {
 +				continue;
 +			}
-+			drawImmu = true;
-+			DrawSolidRectangle(xPos + immuOffset, square, yPos + height + yOffset + borderWidth + 2 - 15, square, resistColors[k]);
++			drawImmu = TRUE;
++			DrawSolidRectangle(xPos + immuOffset, square, yPos + height + yOffset + borderWidth + 2 - square - 5, square, resistColors[k]);
 +			immuOffset += 12;
 +		}
 +	}
 +
-+	static const int newX = xPos + Screen_LeftBorder;
-+	static const int newY = yPos + height - 3;
 +	std::stringstream name;
 +	name << mon->mName;
 +	if (mon->leader > 0) {
 +		name << " (minion)";
 +	}
 +	int namecolor = COL_WHITE;
-+	if (specialMonster) { // || name.str() == "The Dark Lord"
++	if (specialMonster) {
 +		namecolor = COL_GOLD;
 +	}
 +
 +	if (!showHPNumbers) {
-+		PrintGameStr(newX - CalculateTextWidth((char*)name.str().c_str()) / 2, 37, (char*)name.str().c_str(), namecolor);
++		PrintGameStr(xCenter - CalculateTextWidth((char*)name.str().c_str()) / 2, yPos + 17, (char*)name.str().c_str(), namecolor);
 +	} else {
-+		static const int TWSlash = CalculateTextWidth("/");
-+		PrintGameStr(newX - CalculateTextWidth((char*)name.str().c_str()) / 2, 30, (char*)name.str().c_str(), namecolor);
-+		PrintGameStr(newX - TWSlash / 2, 43, "/", COL_WHITE);
-+		std::stringstream current;
-+		current << (currentLife >> 6);
-+		std::stringstream max;
-+		max << (maxLife >> 6);
-+		PrintGameStr(newX + TWSlash, 43, (char*)max.str().c_str(), COL_WHITE);
-+		PrintGameStr(newX - CalculateTextWidth((char*)current.str().c_str()) - TWSlash, 43, (char*)current.str().c_str(), COL_WHITE);
++		PrintGameStr(xCenter - CalculateTextWidth((char*)name.str().c_str()) / 2, yPos + 10, (char*)name.str().c_str(), namecolor);
++		std::stringstream life;
++		life << (currentLife >> 6);
++		life << "/";
++		life << (maxLife >> 6);
++		PrintGameStr(xCenter - CalculateTextWidth((char*)life.str().c_str()) / 2, yPos + height - 2, (char*)life.str().c_str(), COL_WHITE);
 +	}
++	static const int ytxt = yPos + height + borderWidth + 12;
 +	if (showDamageModifiers) {
-+		PrintGameStr(newX - width / 2, 59, resText, COL_GOLD);
++		PrintGameStr(xCenter - width / 2 + 2, ytxt, resText, COL_GOLD);
 +	}
 +
 +	std::stringstream kills;
 +	kills << "Kills: " << monstkills[mon->MType->mtype];
-+	PrintGameStr(newX - CalculateTextWidth("kills")/2-30, 59, (char*)(kills.str().c_str()), COL_WHITE);
++	PrintGameStr(xCenter - CalculateTextWidth("kills") / 2 - 30, ytxt, (char*)(kills.str().c_str()), COL_WHITE);
 +
 +	if (drawImmu) {
-+		PrintGameStr(newX - width / 2, 46-2, immuText, COL_GOLD);
++		PrintGameStr(xCenter - width / 2 + 2, yPos + height - 1, immuText, COL_GOLD);
 +	}
 +	if (showDamageModifiers) {
-+		PrintGameStr(newX + width / 2 - CalculateTextWidth(vulnText), 59, vulnText, COL_RED);
++		PrintGameStr(xCenter + width / 2 - CalculateTextWidth(vulnText), ytxt, vulnText, COL_RED);
 +	}
 +}
 +
  /**
   * @brief Start rendering of screen, town variation
   * @param StartX Center of view in dPiece coordinate
-@@ -997,6 +1126,9 @@ void DrawView(int StartX, int StartY)
+@@ -1210,6 +1336,9 @@ void DrawView(int StartX, int StartY)
  		gmenu_draw_pause();
  	}
  
-+	if (pcursmonst != -1) {
++	if (pcursmonst != -1 && currlevel != 0) {
 +		DrawMonsterHealthBar(pcursmonst);
 +	}
  	DrawControllerModifierHints();

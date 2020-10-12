@@ -1,57 +1,61 @@
 Item highlighting.
 
-Some refactoring and cleaning applied.
+Modifications by Manuel-K:
+- cleanup and refactoring
+- de-hardcode positions
+- update label hiding to accommodate widescreen changes
 
 From Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
-index 40f2d5d8..8d670122 100644
+index 6d53647b..6a163244 100644
 --- a/Source/diablo.cpp
 +++ b/Source/diablo.cpp
-@@ -17,6 +17,7 @@ BOOL gbRunGame;
- int glMid3Seed[NUMLEVELS];
+@@ -23,6 +23,7 @@ BOOL gbGameLoopStartup;
+ BOOL gbRunGame;
  BOOL gbRunGameResult;
  BOOL zoomflag;
 +bool drawitems;
  BOOL gbProcessPlayers;
- int glEndSeed[NUMLEVELS];
  BOOL gbLoadGame;
-@@ -819,6 +820,9 @@ void ReleaseKey(int vkey)
+ int DebugMonsters[10];
+@@ -875,6 +876,9 @@ void ReleaseKey(int vkey)
  {
- 	if (vkey == VK_SNAPSHOT)
+ 	if (vkey == DVL_VK_SNAPSHOT)
  		CaptureScreen();
 +
-+	if (vkey == VK_MENU || vkey == VK_LMENU || vkey == VK_RMENU)
++	if (vkey == DVL_VK_MENU || vkey == DVL_VK_LMENU || vkey == DVL_VK_RMENU)
 +		drawitems = false;
  }
  
  void PressKey(int vkey)
-@@ -992,6 +996,8 @@ void PressKey(int vkey)
+@@ -1053,6 +1057,8 @@ void PressKey(int vkey)
  		if (stextflag) {
  			STextNext();
  		}
-+	} else if(vkey == VK_MENU || vkey == VK_LMENU || vkey == VK_RMENU) {
++	} else if(vkey == DVL_VK_MENU || vkey == DVL_VK_LMENU || vkey == DVL_VK_RMENU) {
 +		drawitems = true;
- 	} else if (vkey == VK_LEFT) {
+ 	} else if (vkey == DVL_VK_LEFT) {
  		if (automapflag && !talkflag) {
  			AutomapLeft();
 diff --git a/Source/diablo.h b/Source/diablo.h
-index dd16dac4..e72d6f7c 100644
+index 6fbde94b..60c74171 100644
 --- a/Source/diablo.h
 +++ b/Source/diablo.h
-@@ -13,6 +13,7 @@ extern BOOL gbRunGame;
- extern int glMid3Seed[NUMLEVELS];
+@@ -25,6 +25,7 @@ extern BOOL gbGameLoopStartup;
+ extern BOOL gbRunGame;
  extern BOOL gbRunGameResult;
  extern BOOL zoomflag;
 +extern bool drawitems;
  extern BOOL gbProcessPlayers;
- extern int glEndSeed[NUMLEVELS];
  extern BOOL gbLoadGame;
+ extern HINSTANCE ghInst;
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
-index 5e4a1e18..5b5d5e73 100644
+index b8fa4626..11527741 100644
 --- a/Source/scrollrt.cpp
 +++ b/Source/scrollrt.cpp
-@@ -1,5 +1,9 @@
+@@ -5,6 +5,10 @@
+  */
  #include "all.h"
  
 +#include <string>
@@ -61,37 +65,32 @@ index 5e4a1e18..5b5d5e73 100644
  DEVILUTION_BEGIN_NAMESPACE
  
  /**
-@@ -594,6 +598,145 @@ static void DrawItem(int x, int y, int sx, int sy, BOOL pre)
+@@ -603,6 +607,138 @@ static void DrawItem(int x, int y, int sx, int sy, BOOL pre)
  	CelClippedDrawLight(px, sy, pItem->_iAnimData, pItem->_iAnimFrame, pItem->_iAnimWidth);
  }
  
 +void HighlightItemsNameOnMap()
 +{
++	// items on ground name highlighting (Qndel)
 +	class itemLabel
 +	{
 +	public:
 +		int itemID;
-+		int row;
-+		int col;
 +		int x;
 +		int y;
 +		int width;
 +		int height;
 +		int magicLevel;
 +		std::string text;
-+		itemLabel(int x, int y, int width, int height, int row, int col, int itemID, int q2, std::string text):
-+			itemID(itemID), row(row), col(col), x(x), y(y), width(width), height(height), magicLevel(q2), text(text) {}
++		itemLabel(int x, int y, int width, int height, int itemID, int q2, std::string text):
++			itemID(itemID), x(x), y(y), width(width), height(height), magicLevel(q2), text(text) {}
 +	};
 +
-+	static const int XOffset = 330;
 +	char textOnGround[256];
 +	std::vector<itemLabel> q;
 +
 +	for (int i = 0; i < numitems; i++) {
 +		ItemStruct& item_local = item[itemactive[i]];
-+		int row = item_local._ix - plr[myplr].WorldX;
-+		int col = item_local._iy - plr[myplr].WorldY;
-+		// items on ground name highlighting (Qndel)
 +		if (item_local._itype == ITYPE_GOLD) {
 +			sprintf(textOnGround, "%i gold", item_local._ivalue);
 +		}
@@ -99,13 +98,14 @@ index 5e4a1e18..5b5d5e73 100644
 +			sprintf(textOnGround, "%s", item_local._iIdentified ? item_local._iIName : item_local._iName);
 +		}
 +
++
 +		int walkStandX = ScrollInfo._sxoff;// +plr[myplr]._pyoff;
 +		int walkStandY = ScrollInfo._syoff;// +plr[myplr]._pxoff;
 +		if (plr[myplr]._pmode == PM_WALK2 && ScrollInfo._sdir == 4) {
 +			walkStandX += 32;
 +			walkStandY += 16;
 +		} else if (plr[myplr]._pmode == PM_WALK2 && ScrollInfo._sdir == 5) {
-+			walkStandY +=32;
++			walkStandY += 32;
 +		}
 +
 +		else if(plr[myplr]._pmode == PM_WALK2 && ScrollInfo._sdir == 6) {
@@ -113,53 +113,51 @@ index 5e4a1e18..5b5d5e73 100644
 +			walkStandY += 16;
 +		}
 +
-+		int x2 = 32 * (row - col) + (200 * (walkStandX) / 100 >> 1);
-+		int y2 = 16 * (row + col) + (200 * (walkStandY) / 100 >> 1) - 16;
++		int row = item_local._ix - plr[myplr]._px;
++		int col = item_local._iy - plr[myplr]._py;
++		int x = (row - col) * TILE_WIDTH  / 2 + (200 * (walkStandX) / 100 >> 1);
++		int y = (row + col) * TILE_HEIGHT / 2 + (200 * (walkStandY) / 100 >> 1);
 +
-+		int labelWidth = CalculateTextWidth(textOnGround);
-+		int x = x2 - labelWidth/2; // attempt to center the label above the item
-+		int y = y2;
 +
 +		// add to drawing queue
-+		int mag = item_local._iMagical;
-+		int ix = item_local._ix;
-+		int iy = item_local._iy;
++		const int labelWidth = CalculateTextWidth(textOnGround);
++		const int &id = itemactive[i];
++		const int &mag = item_local._iMagical;
 +		const std::string &text = std::string(textOnGround);
-+		q.push_back(itemLabel(x, y, labelWidth, 13, ix, iy, itemactive[i], mag, text));
++		q.push_back(itemLabel(x - labelWidth / 2, y, labelWidth, 13, id, mag, text));
 +	}
 +
 +	const int borderX = 5;
-+	//bool highlightItem = false;
 +	for (unsigned int item1 = 0; item1 < q.size(); ++item1) {
 +		std::map<int, bool> backtrace;
-+		bool canShow = false;
++		bool canShow = FALSE;
 +		while (!canShow) {
-+			canShow = true;
++			canShow = TRUE;
 +			for (unsigned int item2 = 0; item2 < item1; ++item2) {
 +				if (abs(q[item2].y - q[item1].y) >= q[item1].height + 2) {
 +					continue;
 +				}
 +				if (q[item2].x >= q[item1].x && q[item2].x - q[item1].x < q[item1].width + borderX) {
-+					canShow = false;
++					canShow = FALSE;
 +					int newpos = q[item2].x - q[item1].width - borderX;
 +					if (backtrace.find(newpos) == backtrace.end()) {
 +						q[item1].x = newpos;
-+						backtrace[newpos] = true;
++						backtrace[newpos] = TRUE;
 +					} else {
 +						newpos = q[item2].x + q[item2].width + borderX;
 +						q[item1].x = newpos;
-+						backtrace[newpos] = true;
++						backtrace[newpos] = TRUE;
 +					}
 +				} else if (q[item2].x < q[item1].x && q[item1].x - q[item2].x < q[item2].width + borderX) {
-+					canShow = false;
++					canShow = FALSE;
 +					int newpos = q[item2].x + q[item2].width + borderX;
 +					if (backtrace.find(newpos) == backtrace.end()) {
 +						q[item1].x = newpos;
-+						backtrace[newpos] = true;
++						backtrace[newpos] = TRUE;
 +					} else {
 +						newpos = q[item2].x - q[item1].width - borderX;
 +						q[item1].x = newpos;
-+						backtrace[newpos] = true;
++						backtrace[newpos] = TRUE;
 +					}
 +				}
 +			}
@@ -168,17 +166,28 @@ index 5e4a1e18..5b5d5e73 100644
 +
 +	for (unsigned int i = 0; i < q.size(); ++i) {
 +		itemLabel &t = q[i];
++
++		int sx = t.x + (SCREEN_WIDTH) / 2;
++		int sy = t.y + (PANEL_TOP) / 2  - 16;
++
++
++		if (sx < 0 || sx > SCREEN_WIDTH || sy < 0 || sy > SCREEN_HEIGHT) {
++			continue;
++		}
++
++		if ((chrflag || questlog) && sx < SPANEL_WIDTH && sy < SPANEL_HEIGHT) {
++			continue;
++		}
++
++		if ((invflag || sbookflag) && sx + t.width > SCREEN_WIDTH - SPANEL_WIDTH  && sy < SPANEL_HEIGHT) {
++			continue;
++		}
++
 +		int bgcolor = 0;
 +		// highlight label if item is under cursor:
 +		if (pcursitem == t.itemID) {
 +			bgcolor = 134;
 +		}
-+
-+		int drawXOffset = -10;
-+		if (invflag || sbookflag)
-+			drawXOffset -= 160;
-+		if (chrflag || questlog)
-+			drawXOffset += 160;
 +
 +		char color = COL_WHITE;
 +		if (t.magicLevel == ITEM_QUALITY_MAGIC) {
@@ -186,28 +195,16 @@ index 5e4a1e18..5b5d5e73 100644
 +		} else if (t.magicLevel == ITEM_QUALITY_UNIQUE) {
 +			color = COL_GOLD;
 +		}
-+		int sx = t.x + XOffset + drawXOffset;
-+		int sy = t.y + 180;
 +
-+		int sx2 = t.x + XOffset + drawXOffset + 63;
-+		int sy2 = t.y + 342;
-+
-+		if (sx < 0 || sx > 640 || sy < 0 || sy > 480) {
-+			continue;
-+		}
-+
-+		if (sx2 < 0 || sx2 > 640 || sy2 < 0 || sy2 > 480) {
-+			continue;
-+		}
-+		DrawSolidRectangle(sx2, t.width + 1, sy2 - t.height, t.height, bgcolor);
-+		PrintGameStr(sx, sy, &t.text[0u], color);
++		DrawSolidRectangle(sx - 1, t.width + 2, sy - t.height + 1, t.height, bgcolor);
++		PrintGameStr(sx, sy, (char*)(t.text.c_str()), color);
 +	}
 +}
 +
  /**
   * @brief Check if and how a mosnter should be rendered
   * @param y dPiece coordinate
-@@ -964,6 +1107,10 @@ void DrawView(int StartX, int StartY)
+@@ -1177,6 +1313,10 @@ void DrawView(int StartX, int StartY)
  
  	DrawDurIcon();
  

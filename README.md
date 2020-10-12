@@ -7,4 +7,4 @@ They can be applied by running
 ```patch -p1 < ../path_to.patch```
 in the devilutionX directory.
 
-Most of the patches are stand-alone. `infernity_item_hightlight_v01.patch` and `infernity_monster_hp_bar_v01.patch` require `infernity_common_v01.patch`.
+Most of the patches are stand-alone. `infernity_item_hightlight_v04.patch` and `infernity_monster_hp_bar_v02.patch` require `infernity_common_v02.patch`.

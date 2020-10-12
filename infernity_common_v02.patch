@@ -3,18 +3,17 @@ Common helper function for Infernity patches.
 CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
 
 diff --git a/Source/engine.cpp b/Source/engine.cpp
-index 5ff803df..cd553a42 100644
+index 93a7d7c6..e12292dd 100644
 --- a/Source/engine.cpp
 +++ b/Source/engine.cpp
-@@ -632,6 +632,24 @@ void engine_draw_pixel(int sx, int sy)
+@@ -648,6 +648,23 @@ void engine_draw_pixel(int sx, int sy)
  		*dst = gbPixelCol;
  }
  
 +void DrawSolidRectangle(int x0, int dx, int y0, int dy, int color) {
-+	char* WorkingSurface = (char*)gpBuffer;
-+	for (int x = x0; x < x0 + dx; x++) {
-+		for (int y = y0; y < y0 + dy; y++) {
-+			WorkingSurface[y*768+x] = color;
++	for (int y = y0; y < y0 + dy; y++) {
++		for (int x = x0; x < x0 + dx; x++) {
++			gpBuffer[(SCREEN_Y + y) * BUFFER_WIDTH + SCREEN_X + x] = color;
 +		}
 +	}
 +}
@@ -28,14 +27,14 @@ index 5ff803df..cd553a42 100644
 +	return l;
 +}
 +
- #define GG_SWAP(A, B) \
- 	{                 \
- 		(A) ^= (B);   \
+ /**
+  * @brief Draw a line on the back buffer
+  * @param x0 Back buffer coordinate
 diff --git a/Source/engine.h b/Source/engine.h
-index 3255c778..025f60ee 100644
+index 8811043a..1b14f332 100644
 --- a/Source/engine.h
 +++ b/Source/engine.h
-@@ -56,6 +56,8 @@ void CelDrawLightRedSafe(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, c
+@@ -78,6 +78,8 @@ void CelDrawLightRedSafe(int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth, c
  void CelBlitWidth(BYTE *pBuff, int x, int y, int wdt, BYTE *pCelBuff, int nCel, int nWidth);
  void CelBlitOutline(char col, int sx, int sy, BYTE *pCelBuff, int nCel, int nWidth);
  void ENG_set_pixel(int sx, int sy, BYTE col);
