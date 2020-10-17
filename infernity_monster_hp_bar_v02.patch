@@ -87,7 +87,7 @@ index b8fa4626..5ff4c8c3 100644
 +		}
 +	}
 +
-+	DrawSolidRectangle(xPos, (int) ceil(FilledPercent * width), yPos, height, filledColor);
++	DrawTransparentRectangle(xPos, (int) ceil(FilledPercent * width), yPos, height, filledColor);
 +
 +	static const int cornerMod = fillCorners ? borderWidth : 0;
 +	static const int x0 = xPos - xOffset;

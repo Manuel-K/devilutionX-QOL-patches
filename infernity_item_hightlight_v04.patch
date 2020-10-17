@@ -196,7 +196,7 @@ index b8fa4626..11527741 100644
 +			color = COL_GOLD;
 +		}
 +
-+		DrawSolidRectangle(sx - 1, t.width + 2, sy - t.height + 1, t.height, bgcolor);
++		DrawTransparentRectangle(sx - 1, t.width + 2, sy - t.height + 1, t.height, bgcolor);
 +		PrintGameStr(sx, sy, (char*)(t.text.c_str()), color);
 +	}
 +}
