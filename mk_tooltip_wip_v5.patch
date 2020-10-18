@@ -1,0 +1,449 @@
+diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
+index 543d88e3..fdbe4337 100644
+--- a/Source/scrollrt.cpp
++++ b/Source/scrollrt.cpp
+@@ -581,6 +581,420 @@ static void drawFloor(int x, int y, int sx, int sy)
+ 	}
+ }
+ 
++
++class Tooltip {
++	private:
++		std::vector<std::string> lines;
++		std::vector<int> line_colors;
++		std::vector<int> line_widths;
++		std::vector<bool> line_center;
++		int max_width;
++	public:
++		void clear() {
++			lines.clear();
++			line_colors.clear();
++			line_widths.clear();
++			line_center.clear();
++			max_width = -1;
++		}
++		void add_line_if_not_empty(const std::string &text, const int &color) {
++			if (strcmp(tempstr, " ") != 0) {
++				add_line(text, color);
++			}
++		}
++		void add_line(const std::string &text, const int &color, bool center = FALSE) {
++			lines.push_back(text);
++			line_colors.push_back(color);
++			const int &width = CalculateTextWidth(text.c_str());
++			line_widths.push_back(width);
++			line_center.push_back(center);
++			if (width > max_width) {
++				max_width = width;
++			}
++		}
++		int width() {
++			return max_width + 1;
++		}
++		int height() {
++			return lines.size() * 13 - 1;
++		}
++		void render(const int &posX, const int &width, const int &posY, const int &height) {
++			DrawTransparentRectangle(posX - 1, width /*+ 2*/, posY - 12 /*- 1*/, height /*+ 2*/, 0);
++			for (int i = 0; i < lines.size(); i++) {
++				PrintGameStr(posX + (line_center[i] ? (width - line_widths[i])/2 : 0), posY + 13 * i, lines[i].c_str(), line_colors[i]);
++			}
++		}
++
++};
++
++void GenerateItemTooltip(Tooltip &tooltip, ItemStruct *pi) {
++	int basecolor = COL_WHITE;
++	if (pi->_iMagical == ITEM_QUALITY_MAGIC) {
++		basecolor =  COL_BLUE;
++	} else if (pi->_iMagical == ITEM_QUALITY_UNIQUE) {
++		basecolor =  COL_GOLD;
++	}
++	static const int defaultcolor = COL_WHITE;
++	static const int reqcolor = COL_RED;
++
++	if (pi->_iIdentified) {
++		tooltip.add_line(pi->_iIName, basecolor, TRUE);
++		if (pi->_iMagical == ITEM_QUALITY_MAGIC && pi->_itype != ITYPE_RING && pi->_itype != ITYPE_AMULET) {
++			tooltip.add_line(pi->_iName, defaultcolor, TRUE); // also include generic name
++		}
++	} else {
++		tooltip.add_line(pi->_iName, basecolor, TRUE);
++	}
++
++	if (pi->_iClass == ICLASS_WEAPON || pi->_iClass == ICLASS_ARMOR) {
++		if (pi->_iClass == ICLASS_WEAPON)
++			sprintf(tempstr, "damage: %i-%i", pi->_iMinDam, pi->_iMaxDam);
++		else
++			sprintf(tempstr, "armor: %i", pi->_iAC);
++		tooltip.add_line(tempstr, defaultcolor);
++		if (pi->_iMaxDur == DUR_INDESTRUCTIBLE) {
++			tooltip.add_line("Indestructible", defaultcolor);
++		} else {
++			sprintf(tempstr, "Durability: %i/%i", pi->_iDurability, pi->_iMaxDur); // was Dur:
++			tooltip.add_line(tempstr, defaultcolor);
++		}
++		if (pi->_iMiscId == IMISC_STAFF && pi->_iMaxCharges) {
++			sprintf(tempstr, "Charges: %i/%i", pi->_iCharges, pi->_iMaxCharges);
++			if (pi->_iCharges > 0) {
++				tooltip.add_line(tempstr, defaultcolor);
++			} else {
++				tooltip.add_line(tempstr, reqcolor);
++			}
++		}
++	}
++	if (pi->_iIdentified) {
++		//from PrintItemDetails(pi);
++		if (pi->_iPrePower != -1) {
++			PrintItemPower(pi->_iPrePower, pi);
++			tooltip.add_line(tempstr, defaultcolor);
++		}
++		if (pi->_iSufPower != -1) {
++			PrintItemPower(pi->_iSufPower, pi);
++			tooltip.add_line(tempstr, defaultcolor);
++		}
++
++		if (pi->_iMagical == ITEM_QUALITY_UNIQUE) {
++			//tooltip.add_line("unique item", defaultcolor);
++			// from DrawUniqueInfo()
++			int uid = pi->_iUid;
++			//tooltip.add_line(UniqueItemList[uid].UIName, defaultcolor);
++			PrintItemPower(UniqueItemList[uid].UIPower1, pi);
++			tooltip.add_line_if_not_empty(tempstr, defaultcolor);
++			if (UniqueItemList[uid].UINumPL > 1) {
++				PrintItemPower(UniqueItemList[uid].UIPower2, pi);
++				tooltip.add_line_if_not_empty(tempstr, defaultcolor);
++			}
++			if (UniqueItemList[uid].UINumPL > 2) {
++				PrintItemPower(UniqueItemList[uid].UIPower3, pi);
++				tooltip.add_line_if_not_empty(tempstr, defaultcolor);
++			}
++			if (UniqueItemList[uid].UINumPL > 3) {
++				PrintItemPower(UniqueItemList[uid].UIPower4, pi);
++				tooltip.add_line_if_not_empty(tempstr, defaultcolor);
++			}
++			if (UniqueItemList[uid].UINumPL > 4) {
++				PrintItemPower(UniqueItemList[uid].UIPower5, pi);
++				tooltip.add_line_if_not_empty(tempstr, defaultcolor);
++			}
++			if (UniqueItemList[uid].UINumPL > 5) {
++				PrintItemPower(UniqueItemList[uid].UIPower6, pi);
++				tooltip.add_line_if_not_empty(tempstr, defaultcolor);
++			}
++		}
++	} else {
++		//from PrintItemDur(pi);
++		if (pi->_iClass == ICLASS_WEAPON || pi->_iClass == ICLASS_ARMOR) {
++			if (pi->_iMagical != ITEM_QUALITY_NORMAL) {
++				tooltip.add_line("Not Identified", reqcolor);
++			}
++		}
++
++		if (pi->_itype == ITYPE_RING || pi->_itype == ITYPE_AMULET) {
++			tooltip.add_line("Not Identified", reqcolor);
++		}
++	}
++
++	//from PrintItemMisc(x);
++	if (pi->_iMiscId == IMISC_EAR) {
++		sprintf(tempstr, "Level : %i", pi->_ivalue);
++		tooltip.add_line(tempstr, defaultcolor);
++	}
++	if (pi->_iMiscId >= IMISC_USEFIRST && pi->_iMiscId <= IMISC_USELAST) {
++		// from PrintItemOil();
++		switch (pi->_iMiscId) {
++			case IMISC_FULLHEAL:
++				tooltip.add_line("fully recover life", defaultcolor);
++				break;
++			case IMISC_HEAL:
++				tooltip.add_line("recover partial life", defaultcolor);
++				break;
++			case IMISC_OLDHEAL:
++				tooltip.add_line("recover life", defaultcolor);
++				break;
++			case IMISC_DEADHEAL:
++				tooltip.add_line("deadly heal", defaultcolor);
++				break;
++			case IMISC_MANA:
++				tooltip.add_line("recover mana", defaultcolor);
++				break;
++			case IMISC_FULLMANA:
++				tooltip.add_line("fully recover mana", defaultcolor);
++				break;
++			case IMISC_ELIXSTR:
++				tooltip.add_line("increase strength", defaultcolor);
++				break;
++			case IMISC_ELIXMAG:
++				tooltip.add_line("increase magic", defaultcolor);
++				break;
++			case IMISC_ELIXDEX:
++				tooltip.add_line("increase dexterity", defaultcolor);
++				break;
++			case IMISC_ELIXVIT:
++				tooltip.add_line("increase vitality", defaultcolor);
++				break;
++			case IMISC_ELIXWEAK:
++				tooltip.add_line("decrease strength", defaultcolor);
++				break;
++			case IMISC_ELIXDIS:
++				tooltip.add_line("decrease strength", defaultcolor);
++				break;
++			case IMISC_ELIXCLUM:
++				tooltip.add_line("decrease dexterity", defaultcolor);
++				break;
++			case IMISC_ELIXSICK:
++				tooltip.add_line("decrease vitality", defaultcolor);
++				break;
++			case IMISC_REJUV:
++				tooltip.add_line("recover life and mana", defaultcolor);
++				break;
++			case IMISC_FULLREJUV:
++				tooltip.add_line("fully recover life and mana", defaultcolor);
++				break;
++		}
++	}
++	//end from PrintItemMisc(x);
++
++	if (pi->_iMinMag + pi->_iMinDex + pi->_iMinStr) {
++		tooltip.add_line("Required:", defaultcolor);
++		if (pi->_iMinStr) {
++			sprintf(tempstr, "  %i Strength", pi->_iMinStr); // was Str
++			if (pi->_iMinStr > plr[myplr]._pStrength) {
++				tooltip.add_line(tempstr, reqcolor);
++			} else {
++				tooltip.add_line(tempstr, defaultcolor);
++			}
++		}
++		if (pi->_iMinMag) {
++			sprintf(tempstr, "  %i Magic", pi->_iMinMag); // was Mag
++			if (pi->_iMinMag > plr[myplr]._pMagic) {
++				tooltip.add_line(tempstr, reqcolor);
++			} else {
++				tooltip.add_line(tempstr, defaultcolor);
++			}
++		}
++		if (pi->_iMinDex) {
++			sprintf(tempstr, "  %i Dexterity", pi->_iMinDex); // was Dex
++			if (pi->_iMinDex > plr[myplr]._pDexterity) {
++				tooltip.add_line(tempstr, reqcolor);
++			} else {
++				tooltip.add_line(tempstr, defaultcolor);
++			}
++		}
++	}
++}
++
++void DrawIventoryItemTooltip() {
++	if (pcursinvitem < 0) {
++		return;
++	}
++	// Don't display info for speedbar items
++	if (pcursinvitem >= NUM_INVLOC + NUM_INV_GRID_ELEM) {
++		return;
++	}
++
++	PlayerStruct *p = &plr[myplr];
++	ItemStruct *item1 = NULL;
++	if (pcursinvitem < NUM_INVLOC) {
++		item1 = &p->InvBody[pcursinvitem];
++	} else if (pcursinvitem < NUM_INVLOC + NUM_INV_GRID_ELEM) {
++		item1 = &p->InvList[pcursinvitem - NUM_INVLOC];
++	}  else {
++		item1 = &p->SpdList[pcursinvitem - NUM_INVLOC - NUM_INV_GRID_ELEM];
++	}
++
++	if (!item1) {
++		return;
++	}
++
++	static Tooltip tooltip1;
++	static Tooltip tooltip2;
++	static Tooltip tooltip3;
++
++	static int last_pcursinvitem = -1;
++	static int last_item1_ix = -1;
++	static int last_item1_iy = -1;
++	static int last_item1_iseed = -1;
++	static int last_item1_IDidx = -1;
++	static char last_item1_iName[64] = "";
++	static char last_item1_iIName[64] = "";
++	// not a complete comparison, but it might suffice
++	if (last_pcursinvitem != pcursinvitem ||
++			last_item1_ix != item1->_ix || last_item1_iy != item1->_iy ||
++			last_item1_iseed != item1->_iSeed || last_item1_IDidx != item1->IDidx ||
++			strcmp(last_item1_iName, item1->_iName) != 0 ||
++			strcmp(last_item1_iIName, item1->_iIName) != 0) {
++		last_pcursinvitem = pcursinvitem;
++		last_item1_ix = item1->_ix;
++		last_item1_iy = item1->_iy;
++		last_item1_iseed = item1->_iSeed;
++		last_item1_IDidx = item1->IDidx;
++		strcpy(last_item1_iName, item1->_iName);
++		strcpy(last_item1_iIName, item1->_iIName);
++
++		tooltip1.clear();
++		tooltip2.clear();
++		tooltip3.clear();
++
++		if (item1->_itype == ITYPE_GOLD) {
++			sprintf(tempstr, "%i gold %s", item1->_ivalue, get_pieces_str(item1->_ivalue));
++			tooltip1.add_line(tempstr, COL_WHITE);
++		} else {
++			GenerateItemTooltip(tooltip1, item1);
++
++			if (pcursinvitem >= NUM_INVLOC &&  pcursinvitem < NUM_INVLOC + NUM_INV_GRID_ELEM) {
++				ItemStruct *item2 = NULL;
++				ItemStruct *item3 = NULL;
++
++				//if (item1->_iLoc == ILOC_TWOHAND || item1->_iLoc == ILOC_ONEHAND) {
++				//	if (p->InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE) {
++				//		item2 = &p->InvBody[INVLOC_HAND_LEFT];
++				//	}
++				//	if (p->InvBody[INVLOC_HAND_RIGHT]._itype != ITYPE_NONE) {
++				//		item3 = &p->InvBody[INVLOC_HAND_RIGHT];
++				//	}
++				//}
++				if (item1->_iLoc == ILOC_ONEHAND) {
++					ItemStruct *candidate = &p->InvBody[INVLOC_HAND_LEFT];
++					if (candidate->_itype != ITYPE_NONE &&
++							((candidate->_itype == ITYPE_SHIELD && item1->_itype == ITYPE_SHIELD) ||
++							 (candidate->_itype != ITYPE_SHIELD && item1->_itype != ITYPE_SHIELD) ||
++							 (candidate->_iLoc == ILOC_TWOHAND))
++						) {
++						item2 = candidate;
++					}
++					candidate = &p->InvBody[INVLOC_HAND_RIGHT];
++					if (candidate->_itype != ITYPE_NONE &&
++							((candidate->_itype == ITYPE_SHIELD && item1->_itype == ITYPE_SHIELD) ||
++							 (candidate->_itype != ITYPE_SHIELD && item1->_itype != ITYPE_SHIELD) ||
++							 (candidate->_iLoc == ILOC_TWOHAND))
++						) {
++						item3 = candidate;
++					}
++				}
++				if (item1->_iLoc == ILOC_TWOHAND) {
++					if (p->InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE) {
++						item2 = &p->InvBody[INVLOC_HAND_LEFT];
++					}
++					if (p->InvBody[INVLOC_HAND_RIGHT]._itype != ITYPE_NONE) {
++						item3 = &p->InvBody[INVLOC_HAND_RIGHT];
++					}
++				}
++				if (item1->_iLoc == ILOC_RING) {
++					if (p->InvBody[INVLOC_RING_LEFT]._itype != ITYPE_NONE) {
++						item2 = &p->InvBody[INVLOC_RING_LEFT];
++					}
++					if (p->InvBody[INVLOC_RING_RIGHT]._itype != ITYPE_NONE) {
++						item3 = &p->InvBody[INVLOC_RING_RIGHT];
++					}
++				}
++				if (item1->_iLoc == ILOC_ARMOR && p->InvBody[INVLOC_CHEST]._itype != ITYPE_NONE) {
++					item2 = &p->InvBody[INVLOC_CHEST];
++				}
++				if (item1->_iLoc == ILOC_HELM && p->InvBody[INVLOC_HEAD]._itype != ITYPE_NONE) {
++					item2 = &p->InvBody[INVLOC_HEAD];
++				}
++				if (item1->_iLoc == ILOC_AMULET && p->InvBody[INVLOC_AMULET]._itype != ITYPE_NONE) {
++					item2 = &p->InvBody[INVLOC_AMULET];
++				}
++				if (item2 == NULL && item3 != NULL) {
++					item2 = item3;
++					item3 = NULL;
++				}
++				if (item2) {
++					tooltip2.add_line("Equipped:", COL_WHITE, TRUE);
++					GenerateItemTooltip(tooltip2, item2);
++				}
++				if (item3) {
++					tooltip3.add_line("Equipped:", COL_WHITE, TRUE);
++					GenerateItemTooltip(tooltip3, item3);
++				}
++			}
++		}
++	}
++
++	// place and render tooltip(s):
++	static const int space = 2;
++	static const int cursor_space = 32;
++	int height1 = tooltip1.height();
++	int width1 = tooltip1.width();
++
++	int posX = MouseX + cursor_space;
++	int posY = MouseY;
++	if (tooltip1.height() < 30 && tooltip2.height() < 10) {
++		posY += cursor_space;
++	}
++
++	bool tooltip1_right = TRUE;
++	if (width1 + posX > SCREEN_WIDTH) {
++		posX = MouseX - width1 - space;
++		tooltip1_right = FALSE;
++	}
++
++	tooltip1.render(posX, width1, posY, height1);
++
++	int height2 = tooltip2.height();
++	if (height2) {
++		int height3 = tooltip3.height();
++
++		int width2 = tooltip2.width();
++		int width3 = 0;
++		if (height3) {
++			width3 = tooltip3.width();
++		}
++
++		int width23 = width2 > width3 ? width2: width3;
++
++		int pos23X = posX;
++		int pos2Y = posY - 13;
++		if (pos2Y < 0) {
++			pos2Y = 0;
++		}
++		if (pos23X + width1 + width23 + space < SCREEN_WIDTH) {
++			pos23X += width1 + space;
++		} else {
++			pos23X -= width23;
++			if (tooltip1_right)
++				pos23X -= cursor_space;
++			else
++				pos23X -= space;
++		}
++
++		tooltip2.render(pos23X, width23, pos2Y, height2);
++		if (height3) {
++			int pos3Y = pos2Y + space + height2;
++			if (pos3Y + height3 > SCREEN_HEIGHT) {
++				pos3Y = pos2Y - space - height3; //untested
++			}
++			tooltip3.render(pos23X, width23, pos3Y, height3);
++		}
++	}
++}
++
+ /**
+  * @brief Draw item for a given tile
+  * @param y dPiece coordinate
+@@ -1452,9 +1866,9 @@ void DrawView(int StartX, int StartY)
+ 	    && (!questlog || SCREEN_HEIGHT >= SPANEL_HEIGHT + PANEL_HEIGHT + 74 || SCREEN_WIDTH >= 4 * SPANEL_WIDTH)) {
+ 		DrawLevelUpIcon();
+ 	}
+-	if (uitemflag) {
+-		DrawUniqueInfo();
+-	}
++	//if (uitemflag) {
++	//	DrawUniqueInfo();
++	//}
+ 	if (qtextflag) {
+ 		DrawQText();
+ 	}
+@@ -1789,6 +2203,10 @@ void DrawAndBlit()
+ 	}
+ 	scrollrt_draw_cursor_item();
+ 
++	if (!deathflag && !gmenu_is_active() && (pcursinvitem > 0 || (pcursinvitem == 0 && invflag))) {
++		DrawIventoryItemTooltip();
++	}
++
+ 	DrawFPS();
+ 
+ 	unlock_buf(0);
