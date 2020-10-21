@@ -1,0 +1,299 @@
+diff --git a/Source/diablo.cpp b/Source/diablo.cpp
+index 93687e4c..5bba4e6b 100644
+--- a/Source/diablo.cpp
++++ b/Source/diablo.cpp
+@@ -165,6 +165,9 @@ static bool ProcessInput()
+ 		CheckCursMove();
+ 		plrctrls_after_check_curs_move();
+ 		track_process();
++		if (track_process_rmb()) {
++			CheckPlrSpell();
++		}
+ 	}
+ 
+ 	return true;
+@@ -199,12 +202,12 @@ void run_game_loop(unsigned int uMsg)
+ 				break;
+ 			}
+ 			TranslateMessage(&msg);
+-			DispatchMessage(&msg);
++			DispatchMessage(&msg); // here
+ 		}
+ 		if (!gbRunGame)
+ 			break;
+ 		if (!nthread_has_500ms_passed(FALSE)) {
+-			ProcessInput();
++			ProcessInput(); // and here
+ 			DrawAndBlit();
+ 			continue;
+ 		}
+@@ -251,6 +254,7 @@ void start_game(unsigned int uMsg)
+ 	sgnTimeoutCurs = CURSOR_NONE;
+ 	sgbMouseDown = 0;
+ 	track_repeat_walk(FALSE);
++	track_repeat_rmb(FALSE);
+ }
+ 
+ void free_game()
+@@ -610,19 +614,21 @@ LRESULT GM_Game(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+ 		GetMousePos(lParam);
+ 		if (sgbMouseDown == 0) {
+ 			sgbMouseDown = 2;
+-			RightMouseDown();
++			track_repeat_rmb(RightMouseDown());
+ 		}
+ 		return 0;
+ 	case DVL_WM_RBUTTONUP:
+ 		GetMousePos(lParam);
+ 		if (sgbMouseDown == 2) {
+ 			sgbMouseDown = 0;
++			track_repeat_rmb(FALSE);
+ 		}
+ 		return 0;
+ 	case DVL_WM_CAPTURECHANGED:
+ 		if (hWnd != (HWND)lParam) {
+ 			sgbMouseDown = 0;
+ 			track_repeat_walk(FALSE);
++			track_repeat_rmb(FALSE);
+ 		}
+ 		break;
+ 	case WM_DIABNEXTLVL:
+@@ -640,6 +646,7 @@ LRESULT GM_Game(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+ 		sound_stop();
+ 		music_stop();
+ 		track_repeat_walk(FALSE);
++		track_repeat_rmb(FALSE);
+ 		sgbMouseDown = 0;
+ 		ShowProgress(uMsg);
+ 		force_redraw = 255;
+@@ -835,7 +842,7 @@ void LeftMouseUp()
+ 		ReleaseStoreBtn();
+ }
+ 
+-void RightMouseDown()
++BOOL RightMouseDown()
+ {
+ 	if (!gmenu_is_active() && sgnTimeoutCurs == CURSOR_NONE && PauseMode != 2 && !plr[myplr]._pInvincible) {
+ 		if (doomflag) {
+@@ -849,13 +856,14 @@ void RightMouseDown()
+ 			        && (pcursinvitem == -1 || !UseInvItem(myplr, pcursinvitem))) {
+ 				if (pcurs == CURSOR_HAND) {
+ 					if (pcursinvitem == -1 || !UseInvItem(myplr, pcursinvitem))
+-						CheckPlrSpell();
++						return CheckPlrSpell();
+ 				} else if (pcurs > CURSOR_HAND && pcurs < CURSOR_FIRSTITEM) {
+ 					NewCursor(CURSOR_HAND);
+ 				}
+ 			}
+ 		}
+ 	}
++	return FALSE;
+ }
+ 
+ BOOL PressSysKey(int wParam)
+@@ -927,6 +935,7 @@ void PressKey(int vkey)
+ 	if (vkey == DVL_VK_ESCAPE) {
+ 		if (!PressEscKey()) {
+ 			track_repeat_walk(FALSE);
++			track_repeat_rmb(FALSE);
+ 			gamemenu_on();
+ 		}
+ 		return;
+@@ -963,6 +972,7 @@ void PressKey(int vkey)
+ 			AddPanelString("No help available", TRUE); /// BUGFIX: message isn't displayed
+ 			AddPanelString("while in stores", TRUE);
+ 			track_repeat_walk(FALSE);
++			track_repeat_rmb(FALSE);
+ 		} else {
+ 			invflag = FALSE;
+ 			chrflag = FALSE;
+@@ -1113,6 +1123,7 @@ void diablo_pause_game()
+ 			PauseMode = 2;
+ 			sound_stop();
+ 			track_repeat_walk(FALSE);
++			track_repeat_rmb(FALSE);
+ 		}
+ 		force_redraw = 255;
+ 	}
+@@ -1209,6 +1220,7 @@ void PressChar(int vkey)
+ 				spselflag = FALSE;
+ 			}
+ 			track_repeat_walk(FALSE);
++			track_repeat_rmb(FALSE);
+ 		}
+ 		return;
+ 	case 'B':
+diff --git a/Source/diablo.h b/Source/diablo.h
+index 60c74171..9204826b 100644
+--- a/Source/diablo.h
++++ b/Source/diablo.h
+@@ -68,7 +68,7 @@ BOOL LeftMouseDown(int wParam);
+ BOOL LeftMouseCmd(BOOL bShift);
+ BOOL TryIconCurs();
+ void LeftMouseUp();
+-void RightMouseDown();
++BOOL RightMouseDown();
+ void j_gmenu_on_mouse_move(LPARAM lParam);
+ BOOL PressSysKey(int wParam);
+ void diablo_hotkey_msg(DWORD dwMsg);
+diff --git a/Source/player.cpp b/Source/player.cpp
+index 12ad5f3c..fe702e6e 100644
+--- a/Source/player.cpp
++++ b/Source/player.cpp
+@@ -3626,7 +3626,7 @@ void MakePlrPath(int pnum, int xx, int yy, BOOL endspace)
+ 	plr[pnum].walkpath[path] = WALK_NONE;
+ }
+ 
+-void CheckPlrSpell()
++BOOL CheckPlrSpell()
+ {
+ 	BOOL addflag;
+ 	int rspell, sd, sl;
+@@ -3646,7 +3646,7 @@ void CheckPlrSpell()
+ 			PlaySFX(PS_MAGE34);
+ #endif
+ 		}
+-		return;
++		return FALSE;
+ 	}
+ 
+ 	if (leveltype == DTYPE_TOWN && !spelldata[rspell].sTownSpell) {
+@@ -3659,7 +3659,7 @@ void CheckPlrSpell()
+ 			PlaySFX(PS_MAGE27);
+ #endif
+ 		}
+-		return;
++		return FALSE;
+ 	}
+ 
+ 	if (!sgbControllerActive) {
+@@ -3672,7 +3672,7 @@ void CheckPlrSpell()
+ 		        && rspell != SPL_REPAIR
+ 		        && rspell != SPL_INFRA
+ 		        && rspell != SPL_RECHARGE) {
+-			return;
++			return FALSE;
+ 		}
+ 	}
+ 
+@@ -3695,17 +3695,19 @@ void CheckPlrSpell()
+ 			sd = GetDirection(plr[myplr]._px, plr[myplr]._py, cursmx, cursmy);
+ 			sl = GetSpellLevel(myplr, plr[myplr]._pRSpell);
+ 			NetSendCmdLocParam3(TRUE, CMD_SPELLXYD, cursmx, cursmy, plr[myplr]._pRSpell, sd, sl);
++			return FALSE;
+ 		} else if (pcursmonst != -1) {
+ 			sl = GetSpellLevel(myplr, plr[myplr]._pRSpell);
+ 			NetSendCmdParam3(TRUE, CMD_SPELLID, pcursmonst, plr[myplr]._pRSpell, sl);
+ 		} else if (pcursplr != -1) {
+ 			sl = GetSpellLevel(myplr, plr[myplr]._pRSpell);
+ 			NetSendCmdParam3(TRUE, CMD_SPELLPID, pcursplr, plr[myplr]._pRSpell, sl);
+-		} else { //145
++			return FALSE;
++		} else { //145 AKA no target
+ 			sl = GetSpellLevel(myplr, plr[myplr]._pRSpell);
+ 			NetSendCmdLocParam2(TRUE, CMD_SPELLXY, cursmx, cursmy, plr[myplr]._pRSpell, sl);
+ 		}
+-		return;
++		return TRUE;
+ 	}
+ 
+ 	if (plr[myplr]._pRSplType == RSPLTYPE_SPELL) {
+@@ -3719,6 +3721,7 @@ void CheckPlrSpell()
+ #endif
+ 		}
+ 	}
++	return FALSE;
+ }
+ 
+ void SyncPlrAnim(int pnum)
+diff --git a/Source/player.h b/Source/player.h
+index 5ce9439c..7ac0e857 100644
+--- a/Source/player.h
++++ b/Source/player.h
+@@ -102,7 +102,7 @@ void CheckCheatStats(int pnum);
+ void ClrPlrPath(int pnum);
+ BOOL PosOkPlayer(int pnum, int x, int y);
+ void MakePlrPath(int pnum, int xx, int yy, BOOL endspace);
+-void CheckPlrSpell();
++BOOL CheckPlrSpell();
+ void SyncPlrAnim(int pnum);
+ void SyncInitPlrPos(int pnum);
+ void SyncInitPlr(int pnum);
+diff --git a/Source/track.cpp b/Source/track.cpp
+index 3a51992c..a73a97c4 100644
+--- a/Source/track.cpp
++++ b/Source/track.cpp
+@@ -9,9 +9,11 @@ DEVILUTION_BEGIN_NAMESPACE
+ 
+ static BYTE sgbIsScrolling;
+ static DWORD sgdwLastWalk;
+-static BOOL sgbIsWalking;
++static BOOL sgbIsWalking; // aka sgbLMBDown
+ static BYTE sgbCommand;
+ static WORD sgwParam1;
++static DWORD sgdwLastRMB;
++static BOOL sgbRMBDown;
+ 
+ void track_process()
+ {
+@@ -49,6 +51,26 @@ void track_process()
+ 	}
+ }
+ 
++BOOL track_process_rmb()
++{
++	if (!sgbRMBDown)
++		return FALSE;
++
++	if (pcursplr != -1) {
++		return FALSE;
++	}
++
++	DWORD tick = SDL_GetTicks();
++	if ((int)(tick - sgdwLastRMB) >= 300) {
++		sgdwLastRMB = tick;
++
++		// plr[myplr]._pRSpell
++
++		return pcursmonst != -1; // TRUE
++	}
++	return FALSE;
++}
++
+ void track_lmb_loc(BYTE bCmd, BYTE x, BYTE y)
+ {
+ 	NetSendCmdLoc(TRUE, bCmd, x, y);
+@@ -76,6 +98,17 @@ void track_repeat_walk(BOOL rep)
+ 	}
+ }
+ 
++void track_repeat_rmb(BOOL state)
++{
++	if (sgbRMBDown == state) {
++		return;
++	}
++	sgbRMBDown = state;
++	if (state) {
++		sgdwLastRMB = SDL_GetTicks() - 50;
++	}
++}
++
+ BOOL track_isscrolling()
+ {
+ 	return sgbIsScrolling;
+diff --git a/Source/track.h b/Source/track.h
+index 08975af3..c31c0415 100644
+--- a/Source/track.h
++++ b/Source/track.h
+@@ -13,9 +13,11 @@ extern "C" {
+ #endif
+ 
+ void track_process();
++BOOL track_process_rmb();
+ void track_lmb_loc(BYTE bCmd, BYTE x, BYTE y);
+ void track_lmb_param1(BYTE bCmd, WORD wParam1);
+ void track_repeat_walk(BOOL rep);
++void track_repeat_rmb(BOOL state);
+ BOOL track_isscrolling();
+ 
+ #ifdef __cplusplus
