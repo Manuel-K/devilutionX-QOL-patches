@@ -5,7 +5,7 @@ Modifications by Manuel-K:
 - de-hardcode positions
 - update label hiding to accommodate widescreen changes
 
-From Infernity by quendel, extracted by sergi4ua.
+From Infernity by qndel, extracted by sergi4ua.
 
 diff --git a/Source/diablo.cpp b/Source/diablo.cpp
 index 6d53647b..6a163244 100644

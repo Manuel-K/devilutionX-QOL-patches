@@ -1,6 +1,6 @@
 Common helper function for Infernity patches.
 
-CalculateTextWidth() from Infernity by quendel, extracted by sergi4ua.
+CalculateTextWidth() from Infernity by qndel, extracted by sergi4ua.
 
 diff --git a/Source/engine.cpp b/Source/engine.cpp
 index 93a7d7c6..a569b8a9 100644

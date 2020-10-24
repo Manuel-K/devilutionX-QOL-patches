@@ -8,7 +8,7 @@ Modifications by Manuel-K:
 
 Self censoring can be disabled by setting cheat to TRUE.
 
-Based on Infernity by quendel, extracted by sergi4ua.
+Based on Infernity by qndel, extracted by sergi4ua.
 
 diff --git a/Source/scrollrt.cpp b/Source/scrollrt.cpp
 index b8fa4626..5ff4c8c3 100644
